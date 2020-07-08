@@ -9,6 +9,19 @@ import os,sys
 import datetime
 import src_parser 
 import ast
+
+#hard-code: needs to be adapted
+targetrepo_path = {
+        'msm-3.18':"/home/zheng/fiberweiteng/msm-3.18",
+        'msm-4.4':"/home/zheng/fiberweiteng/msm-4.4",
+        'msm-4.9':"/home/zheng/fiberweiteng/msm-4.9",
+        'msm-4.14':"/home/zheng/fiberweiteng/msm-4.14",
+        'linux':"/home/zheng/fiberweiteng/linux_stable/linux",
+        'android':"/home/zheng/fiberweiteng/common",
+        'pixel':"/home/zheng/fiberweiteng/msm",
+        'oneplus5':"/data1/zheng/opensource/android_kernel_oneplus_msm8998",
+        }
+
 def _trim_lines(buf):
     for i in range(len(buf)):
         if buf[i][-1] == '\n':
@@ -152,17 +165,7 @@ def determinebyintro(simpleintroduction,infomation):
         return True
     return False
 
-targetrepo_path = {
-        'msm-3.18':"/home/zheng/fiberweiteng/msm-3.18",
-        'msm-4.4':"/home/zheng/fiberweiteng/msm-4.4",
-        'msm-4.9':"/home/zheng/fiberweiteng/msm-4.9",
-        'msm-4.14':"/home/zheng/fiberweiteng/msm-4.14",
-        'linux':"/home/zheng/fiberweiteng/linux_stable/linux",
-        'android':"/home/zheng/fiberweiteng/common",
-        'pixel':"/home/zheng/fiberweiteng/msm",
-        'oneplus5':"/data1/zheng/opensource/android_kernel_oneplus_msm8998",
-        }
-#[target repo] [target branch] []
+#[target repo] [target branch] 
 def patchlocator():
     cve_strictcommit={}
 
@@ -171,9 +174,6 @@ def patchlocator():
     Repo = sys.argv[1]
     targetrepo=targetrepo_path[Repo]
     targetbranch=sys.argv[2]
-    #Type = sys.argv[3]
-    #if Type == 'all':
-    #    Type = ''
     
     string1='cd '+targetrepo+';git log --first-parent --oneline '+targetbranch
     mainlog=helper_zz.command(string1)
@@ -186,11 +186,8 @@ def patchlocator():
         line=line[:-1][1:-1]
         linelist=line.split(", ")
         (month,cve,repo,commit)=(linelist[0][1:-1],linelist[1][1:-1],linelist[2][1:-1],linelist[3][1:-1])
-        if Repo == "android" or Repo == "linux":
-            if "linux" not in repo and "common" not in repo:
-                continue
-        #else:
-        #    if Type not in repo:
+        #if Repo == "android" or Repo == "linux":
+        #    if "linux" not in repo and "common" not in repo:
         #        continue
         (strictlist,fuzzlist)=get_strict_patchcommits((month,cve,repo,commit),targetrepo,targetbranch,commitlog)
         if type(strictlist)==list:

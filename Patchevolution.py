@@ -43,6 +43,7 @@ def Patchevolution_tracker():
 
     cve_info=get_cveinfos()
     cve_functioncontent ={}
+    cve_beforecommit={}
     patchlocator_result = "upstreamresults/"+repo+"/"+branch
     with open(patchlocator_result,"r") as f:
         s_buf = f.readlines()
@@ -51,9 +52,9 @@ def Patchevolution_tracker():
         if any(ignore in line for ignore in ['#','[]','None','too many candidates','not exist','fail']):
             continue
         cve,commit,maincommit = line.split(" ")[:3]
-        #if cve != "CVE-2019-11833":
-        #    continue
         print "\n"+cve,commit,maincommit
+        beforecommit=helper_zz.get_previouscommit(repopath,maincommit)
+        cve_beforecommit[cve]=beforecommit
         (month,cve,original_repo,original_commit)=cve_info[cve]
         original_repopath = helper_zz.get_repopath(original_repo)
         print original_repo,original_commit
@@ -81,10 +82,7 @@ def Patchevolution_tracker():
                     if funccontent in cve_functioncontent[cve][element]:
                         continue
                     else:
-                        cve_functioncontent[cve][element][funccontent] = set([afterpatchcommit])
-        #for element in cve_functioncontent[cve]:
-        #    print element
-        #    print len(cve_functioncontent[cve][element])
+                        cve_functioncontent[cve][element][funccontent] = afterpatchcommit
     cve_functioncontent2 = copy.deepcopy(cve_functioncontent)
     for cve in cve_functioncontent:
         for element in cve_functioncontent[cve]:
@@ -92,8 +90,23 @@ def Patchevolution_tracker():
                 del cve_functioncontent2[cve][element]
         if len(cve_functioncontent2[cve]) == 0:
             del cve_functioncontent2[cve]
+    
+    cve_commit_elements={}
+    for cve in cve_functioncontent:
+        cve_commit_elements[cve]={}
+        beforecommit = cve_beforecommit[cve]
+        for element in cve_functioncontent[cve]:
+            for funccontent in cve_functioncontent[cve][element]:
+                afterpatchcommit = cve_functioncontent[cve][element][funccontent]
+                if afterpatchcommit not in cve_commit_elements[cve]:
+                    cve_commit_elements[cve][afterpatchcommit]={}
+                #later we can log corresponding before patch elemetn(filename/funcname) if they are not strictly the same
+                cve_commit_elements[cve][afterpatchcommit][element]=beforecommit
+
     pickle_out = open("cve_functioncontent_"+branch+"_pickle","wb")
     pickle.dump(cve_functioncontent2,pickle_out)
+    pickle_out = open("cve_commitelement_"+branch+"_pickle","wb")
+    pickle.dump(cve_commit_elements,pickle_out)
 
 
 if __name__ == '__main__':
