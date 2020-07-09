@@ -25,7 +25,7 @@ Download kernel repository, including:
 ~/Patchlocator/upstreamresults/repo/branch
 
 ## 0x2 source code target
-# step1:patch evolution in reference branch
+### step1:patch evolution in reference branch
 **required**: upstreamresults/repo/branch
 `~/Patchlocator$ python Patchevolution.py [repo] [branch]`
 
@@ -35,7 +35,7 @@ used as input of step2
 2)cve_commitelement_[branch+]_pickle
 used as input of 0x3
 
-## step2:match with target source code snapshot
+### step2:match with target source code snapshot
 **required**: cve_functioncontent_[branch+]_pickle
 `~/Patchlocator$ python Patchmatcher_src.py [branch] [targetkernel]`
 
