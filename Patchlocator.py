@@ -10,18 +10,6 @@ import datetime
 import src_parser 
 import ast
 
-#hard-code: needs to be adapted
-targetrepo_path = {
-        'msm-3.18':"/home/zheng/fiberweiteng/msm-3.18",
-        'msm-4.4':"/home/zheng/fiberweiteng/msm-4.4",
-        'msm-4.9':"/home/zheng/fiberweiteng/msm-4.9",
-        'msm-4.14':"/home/zheng/fiberweiteng/msm-4.14",
-        'linux':"/home/zheng/fiberweiteng/linux_stable/linux",
-        'android':"/home/zheng/fiberweiteng/common",
-        'pixel':"/home/zheng/fiberweiteng/msm",
-        'oneplus5':"/data1/zheng/opensource/android_kernel_oneplus_msm8998",
-        }
-
 def _trim_lines(buf):
     for i in range(len(buf)):
         if buf[i][-1] == '\n':
@@ -85,14 +73,14 @@ def get_strict_patchcommits((month,cve,repo,commit),targetrepopath,targetbranch,
                 changefiles2.add((file_name,newfilename))
             commitcandidates=commitcandidates.union(local_candidates)
         else:
-            print cve,file_name,'not exist in this branch log and we dont find substitution'
+            logresult([cve,file_name,'not exist in this branch log and we dont find substitution'])
     
     patchfiles=newpatchfiles
     if len(commitcandidates)==0:
         return (None,None)
     commitcandidateslist = [(commitcandidate,p_buf,targetrepopath) for commitcandidate in commitcandidates]
     if len(commitcandidateslist)> 120:
-        print cve,"too many candidates:",len(commitcandidateslist)
+        logresult([cve,"too many candidates:",len(commitcandidateslist)])
         return [],[]
     p=Pool(24)
     resultlist=p.map(helper_zz.is_patch_commit,commitcandidateslist)
@@ -131,18 +119,18 @@ def get_strict_patchcommits((month,cve,repo,commit),targetrepopath,targetbranch,
             #restore the files of target branch
             updatedfiles=helper_zz.checkoutfiles_commit(kernel,targetbranch,patchfiles)
             if len(inf) >0:
-                print cve,'should be patched in initial commit',initcommit
+                logresult([cve,'should be patched in initial commit',initcommit])
                 return ([initcommit],[])
 
     return (list(strictcommits),list(fuzzcommits))
-    #    print commit
+
 def get_initcommit(kernel,patchfiles):
     patchfile=list(patchfiles)[0]
     string1='cd '+kernel+';git log --first-parent --oneline -- -p '+patchfile
     #print 'get_initcommit',string1
     result=helper_zz.command(string1)
     if len(result)==0:
-        print patchfile,'not exist in',kernel
+        logresult([patchfile,'not exist in',kernel])
         return None
     return result[-1][:12]
 
@@ -165,6 +153,16 @@ def determinebyintro(simpleintroduction,infomation):
         return True
     return False
 
+def logresult(infolist):
+    repo = sys.argv[1]
+    branch = sys.argv[2]
+    line = ''
+    for info in infolist:
+        line += str(info)+' '
+    line = line[:-1]+'\n'
+    with open('upstreamresults/'+repo+'/'+branch,'a') as f:
+        f.write(line)
+
 #[target repo] [target branch] 
 def patchlocator():
     cve_strictcommit={}
@@ -172,7 +170,10 @@ def patchlocator():
     with open('patchdic','r') as f:
         CVEinfo=f.readlines()
     Repo = sys.argv[1]
-    targetrepo=targetrepo_path[Repo]
+    outputdir = 'upstreamresults/'+Repo
+    if not os.path.exists(outputdir):
+        os.mkdirs(outputdir)
+    targetrepo=helper_zz.getrepopath[Repo]
     targetbranch=sys.argv[2]
     
     string1='cd '+targetrepo+';git log --first-parent --oneline '+targetbranch
@@ -186,19 +187,19 @@ def patchlocator():
         line=line[:-1][1:-1]
         linelist=line.split(", ")
         (month,cve,repo,commit)=(linelist[0][1:-1],linelist[1][1:-1],linelist[2][1:-1],linelist[3][1:-1])
-        #if Repo == "android" or Repo == "linux":
-        #    if "linux" not in repo and "common" not in repo:
-        #        continue
+        if Repo == "android" or Repo == "linux":
+            if "linux" not in repo and "common" not in repo:
+                continue
         (strictlist,fuzzlist)=get_strict_patchcommits((month,cve,repo,commit),targetrepo,targetbranch,commitlog)
         if type(strictlist)==list:
             if len(strictlist) ==1 and len(fuzzlist)==0:
                 cve_strictcommit[cve]=strictlist[0]
-                print cve,strictlist[0],helper_zz.get_commitdate(targetrepo,strictlist[0].split(' ')[-1]),repo
+                logresult([cve,strictlist[0],helper_zz.get_commitdate(targetrepo,strictlist[0].split(' ')[-1]),repo])
             else:
-                print cve,strictlist,fuzzlist
+                logresult([cve,strictlist,fuzzlist])
         elif strictlist==None:
             cve_strictcommit[cve]='None'
-            print cve,'None'
+            logresult([cve,'None'])
 
 if __name__ == '__main__':
     patchlocator()

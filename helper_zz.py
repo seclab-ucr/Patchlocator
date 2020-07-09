@@ -5,44 +5,32 @@ import re
 import time
 import src_parser
 import src_parser_zz
-def _trim_lines(buf):
+def trim_lines(buf):
     for i in range(len(buf)):
         if len(buf[i])==0:
             continue
         if buf[i][-1] == '\n':
             buf[i] = buf[i][:-1]
-
-def trim_lines(buf):
-    for i in range(len(buf)):
-        if buf[i][-1] == '\n':
-            buf[i] = buf[i][:-1]
-
+#require hard code
 def get_repopath(repo):
-    if repo=='msm' or repo=='msm-3.4':
-        path= "/home/zheng/fiberweiteng/msm-3.4"
-    elif repo=='msm-3.10':
-        path= "/home/zheng/fiberweiteng/msm-3.10"
-    elif repo=='msm-3.14':
-        path= "/home/zheng/fiberweiteng/msm-3.14"
-    elif repo=='msm-3.18':
-        path= "/home/zheng/fiberweiteng/msm-3.18"
-    elif repo=='msm-4.4':
-        path= "/home/zheng/fiberweiteng/msm-4.4"
-    elif repo=='msm-4.9':
-        path= "/home/zheng/fiberweiteng/msm-4.9"
-    elif repo=='msm-4.14':
-        path= "/home/zheng/fiberweiteng/msm-4.14"
-    elif repo=='linux':
-        path= "/home/zheng/fiberweiteng/linux"
-    elif repo=='common' or repo == 'android':
-        path= "/home/zheng/fiberweiteng/common"
-    elif repo=='androidmsm':
-        path= "/home/zheng/fiberweiteng/msm"
-    else:
-        path=None
-    return path
-
-
+    repo_path = {
+            'msm':"/home/zheng/fiberweiteng/msm-3.4",
+            'msm-3.4':"/home/zheng/fiberweiteng/msm-3.4",
+            'msm-3.10':"/home/zheng/fiberweiteng/msm-3.10",
+            'msm-3.18':"/home/zheng/fiberweiteng/msm-3.18",
+            'msm-4.4':"/home/zheng/fiberweiteng/msm-4.4",
+            'msm-4.9':"/home/zheng/fiberweiteng/msm-4.9",
+            'msm-4.14':"/home/zheng/fiberweiteng/msm-4.14",
+            'linux':"/home/zheng/fiberweiteng/linux_stable/linux",
+            'common':"/home/zheng/fiberweiteng/common",
+            'android':"/home/zheng/fiberweiteng/common",
+            'androidmsm':"/home/zheng/fiberweiteng/msm",
+            'pixel':"/home/zheng/fiberweiteng/msm",
+            'oneplus5':"/data1/zheng/opensource/android_kernel_oneplus_msm8998",
+            }
+    if repo in repo_path:
+        return repo_path[repo]
+    return None
 
 def checkoutcommit(kernel,commit):
     string1="cd "+kernel+"; git checkout -f "+commit
@@ -58,7 +46,7 @@ def get_filenames_commit(kernel,commit):
 
 def get_files(p_buf):
     filenames=set()
-    _trim_lines(p_buf)
+    trim_lines(p_buf)
     diff_index = [i for i in range(len(p_buf)) if p_buf[i].startswith('diff')] + [len(p_buf)]
     for i in range(len(diff_index)-1):
         result=get_filename_diff(p_buf,diff_index[i],diff_index[i+1])
@@ -124,7 +112,7 @@ def get_corresponding_del_adds(filepath):
         p_buf=f.readlines()
     return get_corresponding_del_adds_1(p_buf)
 def get_corresponding_del_adds_1(p_buf):
-    _trim_lines(p_buf)
+    trim_lines(p_buf)
     del_add_list=[]
     st=0
     ed=len(p_buf)
@@ -649,14 +637,14 @@ def get_commitversion(kernel,commitnumber):
 def get_committime(kernel,commitnumber):
     string1="cd "+kernel+";git show --pretty=fuller "+commitnumber
     s_buf=command(string1)
-    _trim_lines(s_buf)
+    trim_lines(s_buf)
     commitDate=get_commitDate(s_buf)
     committime=get_time(commitDate)
     return committime
 def get_commitdate(kernel,commitnumber):
     string1="cd "+kernel+";git show --pretty=fuller "+commitnumber
     s_buf=command(string1)
-    _trim_lines(s_buf)
+    trim_lines(s_buf)
     commitDate=get_commitDate(s_buf)
     #print commitDate
     if commitDate == None:
@@ -672,7 +660,7 @@ def get_commitinformation(kernel,commitnumber):
     string1="cd "+kernel+";git show --pretty=fuller "+commitnumber
     p=subprocess.Popen(string1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     s_buf=p.stdout.readlines()
-    _trim_lines(s_buf)
+    trim_lines(s_buf)
     
     dicinfo={}
     commitDate=get_commitDate(s_buf)
@@ -951,7 +939,7 @@ def get_diffcommit(prevcommit,commit,kernel):
     string1="cd "+kernel+";git show "
     p=subprocess.Popen(string1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     patch_buf=p.stdout.readlines()
-    _trim_lines(patch_buf)
+    trim_lines(patch_buf)
 
     string1="cd "+kernel+";git checkout -f "+prevcommit+";git branch -D tmp"
     p=subprocess.Popen(string1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -972,7 +960,7 @@ def get_commit_content(kernel,commit):
                 break
         string1="cd "+kernel+"; git diff "+oldcommit+" "+commit
         p_buf=command(string1)
-    _trim_lines(p_buf)
+    trim_lines(p_buf)
     return p_buf
 
 def get_commit_functions(kernel,commit,targetfunction=None):

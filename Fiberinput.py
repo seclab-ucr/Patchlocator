@@ -2,6 +2,7 @@
 #input the "cve_commitelement_"+branch+"_pickle" from patchevolution.py
 import helper_zz
 import compilekernels
+import get_debuginfo
 
 #directory that stores reference kernel source code
 refsourcepath = os.getcwd()+'/refsources'
@@ -10,7 +11,7 @@ refkernelpath = '/data1/zheng/msm-4.9'
 #the config file name when compiling reference kernel
 config='sdm845-perf'
 def get_refsources(repo,branch):
-    global repo,branch,refsourcepath
+    global refsourcepath
     if not os.path.exists(refsourcepath):
         os.mkdir(refsourcepath)
     pickle_in = open("cve_commitelement_"+branch+"_pickle",'rb')
@@ -34,8 +35,6 @@ def get_refsources(repo,branch):
                 string1= 'cd '+repopath+';git show '+afterpatchcommit+':'+filename+' > '+filepath
                 helper_zz.command(string1)
 
-refkernelpath = '/data1/zheng/msm-4.9'
-config='sdm845-perf'
 #get binary/symbol table/vmlinux of refkernel
 def get_refkernels(repo,branch):
     global refkernelpath,config
@@ -116,11 +115,10 @@ def get_patches(repo,branch):
                     f.write(line)
 
 
-
-
-
-
-
-
-
-
+if __name__ == '__main__':
+    repo = sys.argv[1]
+    branch = sys.argv[2]
+    get_refsources(repo,branch)
+    get_refkernels(repo,branch)
+    get_debuginfo()
+    get_patches(repo,branch)
