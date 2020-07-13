@@ -3,14 +3,18 @@
 import helper_zz
 import compilekernels
 import get_debuginfo
+import os,sys
+import pickle
+from shutil import copyfile
 
 #directory that stores reference kernel source code
-refsourcepath = os.getcwd()+'/refsources'
+refsourcepath = os.getcwd()+'/Fiberinputs/refsources'
 #directory that stores reference kernel binary/symbol table/vmlinux/debuginfo
 refkernelpath = '/data1/zheng/msm-4.9'
 #the config file name when compiling reference kernel
 config='sdm845-perf'
 def get_refsources(repo,branch):
+    repopath = helper_zz.get_repopath(repo)
     global refsourcepath
     if not os.path.exists(refsourcepath):
         os.mkdir(refsourcepath)
@@ -28,9 +32,9 @@ def get_refsources(repo,branch):
                 os.mkdir(commitpath)
             for (filename,funcname) in cve_commitelement[cve][afterpatchcommit]:
                 print filename
-                directorypath = commitpath+'/'.join(filename.split('/')[:-1])
+                directorypath = commitpath+'/'+'/'.join(filename.split('/')[:-1])
                 if not os.path.exists(directorypath):
-                    os.mkdirs(directorypath)
+                    os.makedirs(directorypath)
                 filepath = commitpath+'/'+filename
                 string1= 'cd '+repopath+';git show '+afterpatchcommit+':'+filename+' > '+filepath
                 helper_zz.command(string1)
@@ -53,7 +57,7 @@ def get_refkernels(repo,branch):
     compilekernels.compile_kernel(repo,commitlist,config,refkernelpath)
 
 #it will cost much time
-def get_debuginfo():
+def Get_debuginfo():
     global refkernelpath
     get_debuginfo.get_debuginfo(refkernelpath)
 
@@ -83,8 +87,9 @@ def generatepatchfile(repo,nopatchcommit,patchcommit,elementset):
     for filename in filename_funcnames:
         p_buf2 = get_patchfile(repopath,nopatchcommit,filename,patchcommit,filename,filename_funcnames[filename])
         totalpatchfile += p_buf2
+    return totalpatchfile
 
-def get_beforepatchcommits(repo,branch):
+def get_beforepatchcommits(branch):
     cve_beforecommits={}
     pickle_in = open("cve_commitelement_"+branch+"_pickle",'rb')
     cve_commitelement = pickle.load(pickle_in)
@@ -101,7 +106,7 @@ def get_beforepatchcommits(repo,branch):
 def get_patches(repo,branch):
     pickle_in = open("cve_commitelement_"+branch+"_pickle",'rb')
     cve_commitelement = pickle.load(pickle_in)
-    cve_beforecommits = get_beforepatchcommits(repo,branch)
+    cve_beforecommits = get_beforepatchcommits(branch)
     for cve in cve_commitelement:
         print cve
         cvepath = refsourcepath+'/'+cve
@@ -110,15 +115,116 @@ def get_patches(repo,branch):
             beforecommit = cve_beforecommits[cve]
             elementset = cve_commitelement[cve][afterpatchcommit].keys()
             patchfile = generatepatchfile(repo,beforecommit,afterpatchcommit,elementset)
+            if not patchfile:
+                print 'dont get patchfile for',afterpatchcommit,'beforecommit:',beforecommit
+                continue
             with open(commitpath+'/'+cve,'w') as f:
                 for line in patchfile:
                     f.write(line)
+
+#generate commands used in Fiber pick phase
+def generate_pickcommands(branch):
+    global refsourcepath,refsourcepath,config
+    pickle_in = open("cve_commitelement_"+branch+"_pickle",'rb')
+    cve_commitelement = pickle.load(pickle_in)
+    pickcommands = []
+    for cve in cve_commitelement:
+        print cve
+        for afterpatchcommit in cve_commitelement[cve]:
+            localrefsourcepath = refsourcepath+'/'+cve+'/'+afterpatchcommit
+            localrefkernelpath = refkernelpath+'/'+afterpatchcommit+'_'+config
+            outputpath = localrefsourcepath
+            patchlistfile = localrefsourcepath+'/patch_list'
+            with open(patchlistfile,'w') as f:
+                f.write(localrefsourcepath+'/'+cve)
+            pickcommand = 'python pick_sig.py '+patchlistfile+' '+localrefsourcepath+' '+outputpath+' '+localrefkernelpath
+            pickcommands += [pickcommand]
+    with open('./Fiberinputs/pickcommands','w') as f:
+        for line in pickcommands:
+            f.write(line+'\n')
+
+#generate commands used in Fiber extract phase
+def generate_extcommands(branch):
+    global refsourcepath,refsourcepath,config
+    pickle_in = open("cve_commitelement_"+branch+"_pickle",'rb')
+    cve_commitelement = pickle.load(pickle_in)
+    extcommands = []
+    for cve in cve_commitelement:
+        print cve
+        for afterpatchcommit in cve_commitelement[cve]:
+            localrefkernelpath = refkernelpath+'/'+afterpatchcommit+'_'+config
+            localrefsourcepath = refsourcepath+'/'+cve+'/'+afterpatchcommit
+            extcommand = 'python ext_sig.py '+localrefkernelpath+' '+localrefsourcepath
+            extcommands += [extcommand]
+    with open('Fiberinputs/extcommands','w') as f:
+        for line in extcommands:
+            f.write(line+'\n')
+
+#generate match commands for reference kernels(mode 0 , 2 in Fiber), only need to be executed once (when there are multiple targets)
+def generate_matchcommands_ref(branch):
+    global refsourcepath,refsourcepath,config
+    pickle_in = open("cve_commitelement_"+branch+"_pickle",'rb')
+    cve_commitelement = pickle.load(pickle_in)
+    cve_beforecommits=get_beforepatchcommits(branch)
+    matchcommands1 = []
+    matchcommands2 = []
+
+    for cve in cve_commitelement:
+        print cve
+        beforepatchcommit = cve_beforecommits[cve]
+        unpatchkernelpath = refkernelpath+'/'+beforepatchcommit+'_'+config
+        if not os.path.exists(unpatchkernelpath):
+            print 'no compiled beforepatch commit:',beforepatchcommit
+            continue
+        for afterpatchcommit in cve_commitelement[cve]:
+            localrefkernelpath = refkernelpath+'/'+afterpatchcommit+'_'+config
+            localrefsourcepath = refsourcepath+'/'+cve+'/'+afterpatchcommit
+            sigspath = localrefsourcepath
+
+            kernelpath = sigspath+'/patchkernel'
+            if not os.path.exists(kernelpath):
+                os.mkdir(kernelpath)
+            copyfile(localrefkernelpath+'/boot',kernelpath+'/boot')
+            copyfile(localrefkernelpath+'/System.map',kernelpath+'/System.map')
+            kernelpath = sigspath+'/unpatchkernel'
+            if not os.path.exists(kernelpath):
+                os.mkdir(kernelpath)
+            copyfile(unpatchkernelpath+'/boot',kernelpath+'/boot')
+            copyfile(unpatchkernelpath+'/System.map',kernelpath+'/System.map')
+
+            matchcommand = 'python match_sig.py '+sigspath+' 0'
+            matchcommands1 += [matchcommand]
+            matchcommand = 'python match_sig.py '+sigspath+' 2'
+            matchcommands2 += [matchcommand]
+    matchcommands = matchcommands1 + matchcommands2
+    with open('Fiberinputs/matchcommands_ref','w') as f:
+        for line in matchcommands:
+            f.write(line+'\n')
+
+def generate_matchcommands_target(branch,targetkernelpath):
+    global refsourcepath,refsourcepath,config
+    pickle_in = open("cve_commitelement_"+branch+"_pickle",'rb')
+    cve_commitelement = pickle.load(pickle_in)
+
+    matchcommands = []
+    for cve in cve_commitelement:
+        print cve
+        for afterpatchcommit in cve_commitelement[cve]:
+            sigspath = refsourcepath+'/'+cve+'/'+afterpatchcommit
+            matchcommand = 'python match_sig.py '+sigspath+' 1 '+targetkernelpath
+            matchcommands += [matchcommand]
+    with open('Fiberinputs/matchcommands_target','w') as f:
+        for line in matchcommands:
+            f.write(line+'\n')
 
 
 if __name__ == '__main__':
     repo = sys.argv[1]
     branch = sys.argv[2]
-    get_refsources(repo,branch)
-    get_refkernels(repo,branch)
-    get_debuginfo()
-    get_patches(repo,branch)
+    #get_refsources(repo,branch)
+    #get_refkernels(repo,branch)
+    Get_debuginfo()
+    #get_patches(repo,branch)
+    #generate_pickcommands(branch)
+    #generate_extcommands(branch)
+    #generate_matchcommands_ref(branch)
