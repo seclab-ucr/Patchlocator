@@ -1,0 +1,90 @@
+CVE-2019-2287 f920e8539ff2 de6abb23dc05 (2019, 2, 22) msm-3.18
+CVE-2019-2260 0b2d45f51214 f332617ebb03 (2019, 1, 7) msm-4.9
+CVE-2019-2328 None
+CVE-2019-2330 ca6cc5b1f208 19a8101c2309 (2019, 4, 7) msm-4.4
+CVE-2019-2308 cc2e11eeb988 058ddcee4c12 (2019, 3, 19) msm-4.9
+CVE-2019-10499 None
+CVE-2019-10538 acdd10382129 a77c16d4981b (2019, 5, 28) msm-4.9
+CVE-2019-2279 60342668d9f7 774fe2ef649e (2019, 4, 24) msm-4.9
+CVE-2019-10529 f7a4df16f6c2 a77c16d4981b (2019, 5, 28) msm-3.10
+CVE-2019-2324 None
+CVE-2019-10524 663b41e7baf1 9393739f2aa4 (2019, 5, 6) msm-3.18
+CVE-2019-2332 None
+CVE-2019-2283 d9f068f9c890 c36d54c34fef (2019, 1, 27) msm-4.4
+CVE-2019-2323 e04ddcedec0b de6abb23dc05 (2019, 2, 22) msm-4.4
+CVE-2019-2325 None
+CVE-2019-2331 [] []
+CVE-2019-10515 713634885415 f332617ebb03 (2019, 1, 7) msm-4.9
+CVE-2018-19824 73000a4cec93 c36d54c34fef (2019, 1, 27) linux
+CVE-2019-10545 too many candidates: 256
+CVE-2019-10545 [] []
+CVE-2019-10571 779b5e0a3ffd 2851bf7e6847 (2019, 7, 22) msm-4.9
+CVE-2018-20961 b3b0809ac25c e7da47f2cfe8 (2018, 5, 16) linux
+CVE-2019-15220 feca0ce34518 1d1a62b98700 (2019, 9, 4) linux
+CVE-2019-15239 74a4c09d4b05 98ae89537923 (2018, 6, 21) linux
+CVE-2019-10607 6c7b11455881 2e93e7371810 (2018, 5, 31) msm-4.9
+CVE-2019-10538 acdd10382129 a77c16d4981b (2019, 5, 28) msm-4.9
+CVE-2019-9455 7f422aa63d5a 61fe509b8406 (2019, 7, 1) common
+CVE-2019-9457 f31c4f65dd09 1388873ab814 (2017, 8, 1) common
+CVE-2017-16939 543aabb7d14b f79dd42b805d (2017, 11, 6) linux
+CVE-2018-1000199 7614f7db9bee 230f5ef8edc6 (2018, 5, 16) linux
+CVE-2018-1000204 ad2518320bc4 98ae89537923 (2018, 6, 21) linux
+CVE-2018-13096 6db154a813f3 f332617ebb03 (2019, 1, 7) linux
+CVE-2018-18397 3de7f8451928 19a8101c2309 (2019, 4, 7) linux
+CVE-2018-19985 5501175cb197 de6abb23dc05 (2019, 2, 22) linux
+CVE-2018-20169 fe26b8d06e96 c36d54c34fef (2019, 1, 27) linux
+CVE-2018-20511 11f734283a98 f332617ebb03 (2019, 1, 7) linux
+CVE-2018-5803 9b7d723439a4 78667dedc643 (2018, 5, 3) linux
+CVE-2019-2182 690da77a544d 0fc5d4170d0e (2018, 3, 3) linux
+CVE-2019-9454 2555029ac9d4 61fe509b8406 (2019, 7, 1) linux
+CVE-2019-9456 63f3bac3bedc 78667dedc643 (2018, 5, 3) linux
+CVE-2019-9447 drivers/input/touchscreen/stm/fts.c not exist in this branch log and we dont find substitution
+CVE-2019-9447 drivers/input/touchscreen/stm/fts.h not exist in this branch log and we dont find substitution
+CVE-2019-9447 drivers/input/touchscreen/stm/fts_proc.c not exist in this branch log and we dont find substitution
+CVE-2019-9447 None
+CVE-2019-9448 drivers/input/touchscreen/stm/fts.c not exist in this branch log and we dont find substitution
+CVE-2019-9448 None
+CVE-2019-9449 drivers/input/touchscreen/stm/fts.c not exist in this branch log and we dont find substitution
+CVE-2019-9449 None
+CVE-2019-9450 drivers/input/touchscreen/stm/fts.c not exist in this branch log and we dont find substitution
+CVE-2019-9450 drivers/input/touchscreen/stm/fts.h not exist in this branch log and we dont find substitution
+CVE-2019-9450 drivers/input/touchscreen/stm/fts_proc.c not exist in this branch log and we dont find substitution
+CVE-2019-9450 None
+CVE-2018-11988 e711b1604c9c 9929f59dd21f (2018, 6, 23) msm-3.10
+CVE-2018-12011 6f3f1fab1dd8 9e72d10cef9b (2018, 7, 23) msm-3.10
+CVE-2019-10497 None
+CVE-2018-11832 None
+CVE-2018-11939 too many candidates: 179
+CVE-2018-11939 [] []
+CVE-2018-11984 010362419c9d f1ef67c39eac (2018, 7, 5) msm-3.18
+CVE-2018-13912 fcb0259e711b d634f74a5dc2 (2018, 10, 5) msm-3.18
+CVE-2019-2341 None
+CVE-2019-10502 None
+CVE-2018-11818 9bd358e60c25 78a8a5037990 (2018, 3, 6) msm-4.4
+CVE-2018-11986 fd4231b22522 85a4a4c4437e (2018, 8, 5) msm-4.4
+CVE-2018-12010 None
+CVE-2018-13893 29f7f2ddc8e1 57d3486c6e7a (2018, 8, 30) msm-4.4
+CVE-2018-3574 53261410da62 d9534cd84408 (2017, 12, 14) msm-4.4
+CVE-2019-2263 99a0673b62c0 854975ee1bbf (2017, 8, 23) msm-4.4
+CVE-2019-2333 c4d8316b4fb4 6c6aaf4e8330 (2019, 3, 7) msm-4.4
+CVE-2019-2345 0712459df980 6acb6f98163d (2018, 3, 23) msm-4.4
+CVE-2018-11823 4519cc36b1a3 070aae3337ac (2018, 5, 19) msm-4.9
+CVE-2018-11919 3c5708c68da7 4d65a7ab88b7 (2018, 7, 2) msm-4.9
+CVE-2018-11983 76cb203a44ed c9ebd8b20d52 (2018, 7, 2) msm-4.9
+CVE-2018-11987 a897bba475fa b50d2bd7c7df (2018, 6, 23) msm-4.9
+CVE-2018-13913 93afe76a8a9e 0a6ff72374f8 (2018, 10, 5) msm-4.9
+CVE-2018-3564 8714e647c61c aa022618939c (2018, 5, 29) msm-4.9
+CVE-2019-10528 dbb1c2a6472a 4ab88a87a831 (2018, 2, 6) msm-4.9
+CVE-2019-10565 b5e135c0fb2c 8eedcc7ff9de (2018, 6, 21) msm-4.9
+CVE-2019-2284 931aa630b763 1d7b97667c43 (2019, 4, 15) msm-4.9
+CVE-2019-2314 668ca7417227 19a8101c2309 (2019, 4, 7) msm-4.9
+CVE-2019-2314 668ca7417227 19a8101c2309 (2019, 4, 7) msm-4.9
+CVE-2019-15917 3858f013de0a e276e60d848d (2020, 2, 11) common
+CVE-2018-11266 2c841eeed123 01e81c03e7be (2017, 7, 21) msm-3.18
+CVE-2018-5856 None
+CVE-2019-10520 None
+CVE-2019-10555 a46d3886124e 61fe509b8406 (2019, 7, 1) msm-4.14
+CVE-2018-11274 [] []
+CVE-2019-10530 8c234a58c429 de6abb23dc05 (2019, 2, 22) msm-4.9
+CVE-2017-18379 [] []
+CVE-2017-18595 5dc4cd2688e3 b82affb897d2 (2018, 1, 26) linux
