@@ -62,7 +62,7 @@ In Fiberinput.py there are 8 functions, you should execute them in order. [targe
 - *get_refkernels()*: used for getting binary image/symbol table/vmlinux of reference kernel. We will compile reference kernels here.
 **Note**: Before execute get_refkernels(). Please execute the following command in advance.
 `~/Patchlocator$ source ./environ.sh`
-This command set environment variables required for compiling. You can use the provided GCC in tools directory () or download official GCC and hard-code the path in environ.sh.
+This command set environment variables required for compiling. You can use the provided GCC in [tools directory](https://drive.google.com/drive/folders/1AeoCTErs2ZuE9e-Ds88zOq57OqmB4RP2?usp=sharing) or download official GCC and hard-code the path in environ.sh.
 - *Get_debuginfo()*: used for extracting debug info from vmlinux. You can use the provided addr2line in tools directory or download GCC by yourself and hard-code the path in environ.sh. 
 - *get_patches()*: used for getting patch file. (for each CVE, each reference kernel).
 
