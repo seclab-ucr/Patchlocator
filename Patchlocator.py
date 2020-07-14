@@ -37,9 +37,11 @@ def get_strict_patchcommits((month,cve,repo,commit),targetrepopath,targetbranch,
 
     #If no results from introduction, we need to use content of patch to locate the patch commit
     helper_zz.checkoutcommit(patchkernel,targetbranch)
+    if not os.path.exists('patches'):
+        os.mkdir('patches')
     patchPath="patches/"+cve
     if not os.path.exists(patchPath):
-        p_buf=helper_zz.get_commit_content(kernel,commit)
+        p_buf=helper_zz.get_commit_content(patchkernel,commit)
         with open(patchPath,"w") as f:
             for line in p_buf:
                 f.write(line+"\n")
@@ -173,7 +175,7 @@ def patchlocator():
     outputdir = 'upstreamresults/'+Repo
     if not os.path.exists(outputdir):
         os.mkdirs(outputdir)
-    targetrepo=helper_zz.getrepopath[Repo]
+    targetrepo=helper_zz.get_repopath(Repo)
     targetbranch=sys.argv[2]
     
     string1='cd '+targetrepo+';git log --first-parent --oneline '+targetbranch
@@ -184,6 +186,7 @@ def patchlocator():
     for line in CVEinfo:
         if not line.startswith('('):
             continue
+        print line[:-1]
         line=line[:-1][1:-1]
         linelist=line.split(", ")
         (month,cve,repo,commit)=(linelist[0][1:-1],linelist[1][1:-1],linelist[2][1:-1],linelist[3][1:-1])

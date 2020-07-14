@@ -15,7 +15,7 @@ Download kernel repository, including:
 **Note**: Hardcode the repo paths in helper_zz.py get_repopath()
 
 ## 0x1 repository target
-**required**: patchdic
+**required**: patchdic. patchdic should contains patch name (for example, CVE number), corresponding repository name (for example, linux), and corresponding commit number. 
 `~/Patchlocator$ python Patchlocator.py [repo] [branch]`
 
 - *repo*: target repo name. 
@@ -45,11 +45,46 @@ used as input of 0x3
 [targetkernel]/matchresults
 
 ## 0x3 binary image target
+
+If the target kernel is a binary image, we needs to make use of Fiber, please follow[E-Fiber](https://github.com/zhangzhenghsy/fiber-1/tree/E-Fiber). To make things easier for users, we prepare a script (Fiberinput.py) for generating inputs of E-Fiber as well as the corresponding Fiber commands.
+
 **required**: cve_commitelement_[branch+]_pickle
-`~/Patchlocator$ python Fiberinput.py [repo] [branch]`
+`~/Patchlocator$ python Fiberinput.py [repo] [branch] [target kernel path]`
 
 **Note**: Hardcode [refsourcepath] [refkernelpath] [config] in Fiberinput.py
 - *refsourcepath*:directory that stores reference kernel source code
 - *refkernelpath*:directory that stores reference kernel binary/symbol table/vmlinux/debuginfo
 - *config*:the config file name when compiling reference kernel
+
+In Fiberinput.py there are 8 functions, you should execute them in order. [target kernel path] is only used in the last function.
+
+- *get_refsources()*: used for getting patch-related source codes of reference kernel.
+- *get_refkernels()*: used for getting binary image/symbol table/vmlinux of reference kernel. We will compile reference kernels here.
+**Note**: Before execute get_refkernels(). Please execute the following command in advance.
+`~/Patchlocator$ source ./environ.sh`
+This command set environment variables required for compiling. You can use the provided GCC in tools directory or download GCC by yourself and hard-code the path in environ.sh.
+- *Get_debuginfo()*: used for extracting debug info from vmlinux. You can use the provided addr2line in tools directory or download GCC by yourself and hard-code the path in environ.sh. 
+- *get_patches()*: used for getting patch file. (for each CVE, each reference kernel).
+
+- *generate_pickcommands()*: generate commands used in Fiber pick phase.
+**output**: Fiberinputs/pickcommands
+- *generate_extcommands()*: generate commands used in Fiber extract phase.
+**output**: Fiberinputs/extcommands
+- *generate_matchcommands_ref()*: generate match commands for reference kernels(mode 0 , 2 in Fiber).
+**output**: Fiberinputs/matchcommands_ref
+- *generate_matchcommands_target()*: generate match commands for target kernels(mode 0 , 2 in Fiber).
+**output**: Fiberinputs/matchcommands_targetkernel
+
+**Note**: when you have multiple target kernels with the same reference branch, you only need to execute generate_pickcommands()/generate_extcommands()/generate_matchcommands_ref once but execute generate_matchcommands_target() for each target.
+
+
+## 0x4 Notes for other files
+
+**helper_zz.py**: stores some helper functions related to git repository.
+**src_parser.py**: stores some helper functions related to source code parse.
+**sym_table.py**: stores some helper functions related to symbol table.
+
+**compilekernels.py**: stores some helper functions related to kernel compilation.
+**get_debuginfo.py**: stores some helper functions related to extracting and storing debug info files.
+**tools**: gcc and addr2line. Used in compilekernels.py and get_debuginfo.py
 
