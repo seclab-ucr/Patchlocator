@@ -81,7 +81,7 @@ This command set environment variables required for compiling. You can use the p
 
 **Note**: when you have multiple target kernels with the same reference branch, you only need to execute generate_pickcommands()/generate_extcommands()/generate_matchcommands_ref once but execute generate_matchcommands_target() for each target.
 
-Finally, you can execute the commands in E-Fiber directory, you can execute the commands in parallel to speed up the process. 
+Finally, you can execute the commands in E-Fiber directory, you can execute the commands in parallel to speed up the process. (For example, with the help of GNU Parallel) 
 ## 0x4 Notes for other files
 
 **helper_zz.py**: stores some helper functions related to git repository.
