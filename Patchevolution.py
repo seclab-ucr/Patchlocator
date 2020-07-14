@@ -44,7 +44,7 @@ def Patchevolution_tracker():
     cve_info=get_cveinfos()
     cve_functioncontent ={}
     cve_beforecommit={}
-    patchlocator_result = "upstreamresults/"+repo+"/"+branch
+    patchlocator_result = "output/upstreamresults/"+repo+"/"+branch
     with open(patchlocator_result,"r") as f:
         s_buf = f.readlines()
     for line in s_buf:

@@ -10,14 +10,14 @@ from shutil import copyfile
 #directory that stores reference kernel source code
 refsourcepath = os.getcwd()+'/Fiberinputs/refsources'
 #directory that stores reference kernel binary/symbol table/vmlinux/debuginfo
-refkernelpath = '/data1/zheng/msm-4.9'
+refkernelpath = os.getcwd()+'/Fiberinputs/refkernels' 
 #the config file name when compiling reference kernel
 config='sdm845-perf'
 def get_refsources(repo,branch):
     repopath = helper_zz.get_repopath(repo)
     global refsourcepath
     if not os.path.exists(refsourcepath):
-        os.mkdir(refsourcepath)
+        os.makedirs(refsourcepath)
     pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
     cve_commitelement = pickle.load(pickle_in)
     for cve in cve_commitelement:
@@ -31,7 +31,7 @@ def get_refsources(repo,branch):
             if not os.path.exists(commitpath):
                 os.mkdir(commitpath)
             for (filename,funcname) in cve_commitelement[cve][afterpatchcommit]:
-                print filename
+                #print filename,funcname
                 directorypath = commitpath+'/'+'/'.join(filename.split('/')[:-1])
                 if not os.path.exists(directorypath):
                     os.makedirs(directorypath)
@@ -43,7 +43,7 @@ def get_refsources(repo,branch):
 def get_refkernels(repo,branch):
     global refkernelpath,config
     if not os.path.exists(refkernelpath):
-        os.mkdir(refsourcepath)
+        os.makedirs(refkernelpath)
     pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
     cve_commitelement = pickle.load(pickle_in)
     commitlist = []

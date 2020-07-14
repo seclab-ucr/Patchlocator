@@ -3,9 +3,7 @@ import helper_zz
 import pickle
 
 def compare_sourcecode(branch,targetpath):
-    repo2=repo[4]+'_'+repo[6:]
-    filepath='./cve_functioncontent_'+branch+'_pickle'
-    #filepath='cve_functioncontent_3_18_pickle'
+    filepath='./output/cve_functioncontent_'+branch+'_pickle'
     pickle_in=open(filepath,'rb')
     cve_functioncontent=pickle.load(pickle_in)
     cvelist=[cve for cve in cve_functioncontent]

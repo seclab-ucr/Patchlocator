@@ -174,7 +174,7 @@ def patchlocator():
     Repo = sys.argv[1]
     outputdir = 'output/upstreamresults/'+Repo
     if not os.path.exists(outputdir):
-        os.mkdirs(outputdir)
+        os.makedirs(outputdir)
     targetrepo=helper_zz.get_repopath(Repo)
     targetbranch=sys.argv[2]
     
