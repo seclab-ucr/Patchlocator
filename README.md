@@ -49,46 +49,56 @@ Used as input of 0x3
 - *targetkernel*: path to target source code kernel
 
 **output**: 
-[targetkernel]/matchresults
+
+[targetkernel]/matchresults where P means the related patch has been adopted,  NE means the related patch has not been adopted and None means the patch-related function is not found in targetkernel.
 
 ## 0x3 binary image target
 
-If the target kernel is a binary image, we needs to make use of Fiber, please follow[E-Fiber](https://github.com/zhangzhenghsy/fiber-1/tree/E-Fiber). To make things easier for users, we prepare a script (Fiberinput.py) to generate inputs of E-Fiber (reference source code/binary image,debug info...) as well as the corresponding Fiber commands.
+If the target kernel is a binary image, we need to make use of Fiber, please follow[E-Fiber](https://github.com/zhangzhenghsy/fiber-1/tree/E-Fiber). To make things easier for users, we prepare a script (Fiberinput.py) to generate inputs of E-Fiber (reference source code/binary image,debug info...) as well as the corresponding E-Fiber commands.
 
 **required**: cve_commitelement_[branch+]_pickle
-`~/Patchlocator$ python Fiberinput.py [repo] [branch] [target kernel path]`
+
+`~/Patchlocator$ python Fiberinput.py [repo] [branch] [targetkernel]`
+
+- *targetkernel*: path to target binary kernel. targetkernel/boot (binary image) is the binary image.
 
 **Note**: Hardcode [refsourcepath] [refkernelpath] [config] in Fiberinput.py
-- *refsourcepath*:directory that stores reference kernel source code
-- *refkernelpath*:directory that stores reference kernel binary/symbol table/vmlinux/debuginfo
-- *config*:the config file name when compiling reference kernel
+- *refsourcepath*: directory where we want to store reference kernel source code.
+- *refkernelpath*: directory where we want to store reference kernel binary/symbol table/vmlinux/debuginfo.
+- *config*: the config file name when compiling reference kernel. For example, sdm845-perf.
 
-In Fiberinput.py there are 8 functions, you should execute them in order. [target kernel path] is only used in the last function.
+In Fiberinput.py there are 8 functions, you should execute them in order. [targetkernel] is only used in the last function.
 
 - *get_refsources()*: used for getting patch-related source codes of reference kernel.
 - *get_refkernels()*: used for getting binary image/symbol table/vmlinux of reference kernel. We will compile reference kernels here.
+
 **Note**: Before execute get_refkernels(). Please execute the following command in advance.
-`~/Patchlocator$ source ./environ.sh`
-This command set environment variables required for compiling. You can use the provided GCC in [tools directory](https://drive.google.com/drive/folders/1AeoCTErs2ZuE9e-Ds88zOq57OqmB4RP2?usp=sharing) or download official GCC and hard-code the path in environ.sh.
+
+`~/Patchlocator$ source environ.sh`
+
+This command set environment variables required for compiling. You can use the provided GCC in shared [tools directory](https://drive.google.com/drive/folders/1AeoCTErs2ZuE9e-Ds88zOq57OqmB4RP2?usp=sharing) or download official GCC and hard-code the path in environ.sh.
 - *Get_debuginfo()*: used for extracting debug info from vmlinux. You can use the provided addr2line in tools directory or download GCC by yourself and hard-code the path in environ.sh. 
-- *get_patches()*: used for getting patch file. (for each CVE, each reference kernel).
+- *get_patches()*: used for getting patch file. (for each CVE, each reference kernel, there is a patchfile).
 
 - *generate_pickcommands()*: generate commands used in Fiber pick phase.
 
-**output**: Fiberinputs/pickcommands
+    **output**: Fiberinputs/pickcommands
 - *generate_extcommands()*: generate commands used in Fiber extract phase.
 
-**output**: Fiberinputs/extcommands
+    **output**: Fiberinputs/extcommands
 - *generate_matchcommands_ref()*: generate match commands for reference kernels(mode 0 , 2 in Fiber).
 
-**output**: Fiberinputs/matchcommands_ref
+    **output**: Fiberinputs/matchcommands_ref
 - *generate_matchcommands_target()*: generate match commands for target kernels(mode 0 , 2 in Fiber).
 
-**output**: Fiberinputs/matchcommands_targetkernel
+    **output**: Fiberinputs/matchcommands_targetkernel
 
 **Note**: when you have multiple target kernels with the same reference branch, you only need to execute generate_pickcommands()/generate_extcommands()/generate_matchcommands_ref once but execute generate_matchcommands_target() for each target.
 
-Finally, you can execute the commands in E-Fiber directory, you can execute the commands in parallel to speed up the process. (For example, with the help of GNU Parallel) 
+Finally, you can execute the commands in E-Fiber directory, you can execute the commands in parallel to speed up the process. (For example, with the help of GNU Parallel).
+
+**Note**: Since we match target kernel with signatures generated from multiple reference kernels, for each patch there are multiple results in targetkernel/matchresults. If one of them is 'P', then we think it's adopted in targetkernel.
+
 ## 0x4 Notes for other files
 
 **helper_zz.py**: stores some helper functions related to git repository.
