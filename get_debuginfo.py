@@ -4,6 +4,7 @@ from sym_table import Sym_Table
 import subprocess
 import time
 from multiprocessing import Pool
+import helper_zz
 
 ADDR2LINE = 'tools/aarch64-linux-android-4.9/bin/aarch64-linux-android-addr2line'
 
@@ -25,10 +26,13 @@ def get_debuginfo(kernelspath):
         print element
 
 def get_debuginfo_1(PATH):
+    if not os.path.exists(PATH+"/"+"boot"):
+        print 'no binary image in',PATH
+        return
     symbletable_path=PATH+"/"+"System.map"
     if not os.path.exists(symbletable_path):
-        print 'no symbol table for',PATH
-        return
+        string1='./ext_sym '+PATH+'/boot > '+PATH+'/System.map'
+        result=helper_zz.command(string1)
     image=PATH+"/"+"vmlinux"
     if not os.path.exists(image):
         print 'no vmlinux for',PATH

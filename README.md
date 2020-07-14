@@ -2,7 +2,7 @@
 
 Open source patch presence test system. Given a patch commit in upstream repository, check if the patch is applied in downstream repository/source code snapshots.
 
-If only binary image available, it can generate necessary inputs required by Fiber(https://github.com/fiberx/fiber),then we can make use of Fiber to generate binary signatures.
+If only binary image available, it can generate necessary inputs required by Fiber(https://github.com/fiberx/fiber),then we can make use of Fiber to generate binary signatures and match them with target binary image to get the results.
 
 ## 0x0 preparation
 
@@ -91,5 +91,7 @@ Finally, you can execute the commands in E-Fiber directory, you can execute the 
 **sym_table.py**: stores some helper functions related to symbol table.
 
 **compilekernels.py**: stores some helper functions related to kernel compilation.
+
+**ext_sym**: used for generating symbol tables. We get it from Fiber.
 
 **get_debuginfo.py**: stores some helper functions related to extracting and storing debug info files.

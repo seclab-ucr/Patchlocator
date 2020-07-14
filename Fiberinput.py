@@ -202,6 +202,14 @@ def generate_matchcommands_ref(branch):
             f.write(line+'\n')
 
 def generate_matchcommands_target(branch,targetkernelpath):
+    if not os.path.exists(targetkernelpath+'/boot'):
+        print 'no binary image in',targetkernelpath
+        return
+    symbletable_path=targetkernelpath+"/"+"System.map"
+    if not os.path.exists(symbletable_path):
+        string1='./ext_sym '+targetkernelpath+'/boot > '+targetkernelpath+'/System.map'
+        result=helper_zz.command(string1)
+
     global refsourcepath,refsourcepath,config
     pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
     cve_commitelement = pickle.load(pickle_in)
@@ -228,3 +236,4 @@ if __name__ == '__main__':
     generate_pickcommands(branch)
     generate_extcommands(branch)
     generate_matchcommands_ref(branch)
+    generate_matchcommands_target(branch,sys.argv[3])
