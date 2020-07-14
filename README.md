@@ -2,7 +2,7 @@
 
 Open source patch presence test system. Given a patch commit in upstream repository, check if the patch is applied in downstream repository/source code snapshots.
 
-If only binary image available, it can generate necessary inputs required by Fiber(https://github.com/fiberx/fiber),then we can make use of Fiber to generate binary signatures and match them with target binary image to get the results.
+If only binary image available, it can generate necessary inputs required by [E-Fiber](https://github.com/zhangzhenghsy/fiber-1/tree/E-Fiber), then we can make use of Fiber to generate binary signatures and match them with target binary image to get the results.
 
 ## 0x0 preparation
 
