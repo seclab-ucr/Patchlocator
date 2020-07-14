@@ -1,17 +1,19 @@
-import os,sys
+import os
+import sys
 from sym_table import Sym_Table
 import subprocess
 import time
 from multiprocessing import Pool
 
-ADDR2LINE = '/home/zheng/fiberweiteng/aarch64-linux-android-4.9/bin/aarch64-linux-android-addr2line'
+ADDR2LINE = 'tools/aarch64-linux-android-4.9/bin/aarch64-linux-android-addr2line'
 
 def get_debuginfo(kernelspath):
     dirs = os.listdir(kernelspath)
     PATHLIST=[]
     #clear
     for Dir in dirs :
-        PATH=kernelspath+Dir
+        PATH=kernelspath+'/'+Dir
+        print PATH
         if not os.path.exists(PATH+"/vmlinux"):
             continue
         if not os.path.exists(PATH+"/tmp_o"):
@@ -28,7 +30,7 @@ def get_debuginfo_1(PATH):
         print 'no symbol table for',PATH
         return
     image=PATH+"/"+"vmlinux"
-    if not os.path.exists(image)
+    if not os.path.exists(image):
         print 'no vmlinux for',PATH
         return
     print PATH
@@ -47,4 +49,5 @@ def get_debuginfo_1(PATH):
     return (PATH,(t1-t0),(hex(addrlist[0][0]),hex(addrlist[-1][1])))
 
 if __name__ == '__main__':
-    get_debuginfo()
+    #get_debuginfo()
+    get_debuginfo_1(sys.argv[1])

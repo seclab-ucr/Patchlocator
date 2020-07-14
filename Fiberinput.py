@@ -18,7 +18,7 @@ def get_refsources(repo,branch):
     global refsourcepath
     if not os.path.exists(refsourcepath):
         os.mkdir(refsourcepath)
-    pickle_in = open("cve_commitelement_"+branch+"_pickle",'rb')
+    pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
     cve_commitelement = pickle.load(pickle_in)
     for cve in cve_commitelement:
         print 'get reference kernel source code for',cve
@@ -44,7 +44,7 @@ def get_refkernels(repo,branch):
     global refkernelpath,config
     if not os.path.exists(refkernelpath):
         os.mkdir(refsourcepath)
-    pickle_in = open("cve_commitelement_"+branch+"_pickle",'rb')
+    pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
     cve_commitelement = pickle.load(pickle_in)
     commitlist = []
     for cve in cve_commitelement:
@@ -91,7 +91,7 @@ def generatepatchfile(repo,nopatchcommit,patchcommit,elementset):
 
 def get_beforepatchcommits(branch):
     cve_beforecommits={}
-    pickle_in = open("cve_commitelement_"+branch+"_pickle",'rb')
+    pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
     cve_commitelement = pickle.load(pickle_in)
     for cve in cve_commitelement:
         for afterpatchcommit in cve_commitelement[cve]:
@@ -104,7 +104,7 @@ def get_beforepatchcommits(branch):
 
 #we put the patches in the same dir as refsources
 def get_patches(repo,branch):
-    pickle_in = open("cve_commitelement_"+branch+"_pickle",'rb')
+    pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
     cve_commitelement = pickle.load(pickle_in)
     cve_beforecommits = get_beforepatchcommits(branch)
     for cve in cve_commitelement:
@@ -125,7 +125,7 @@ def get_patches(repo,branch):
 #generate commands used in Fiber pick phase
 def generate_pickcommands(branch):
     global refsourcepath,refsourcepath,config
-    pickle_in = open("cve_commitelement_"+branch+"_pickle",'rb')
+    pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
     cve_commitelement = pickle.load(pickle_in)
     pickcommands = []
     for cve in cve_commitelement:
@@ -146,7 +146,7 @@ def generate_pickcommands(branch):
 #generate commands used in Fiber extract phase
 def generate_extcommands(branch):
     global refsourcepath,refsourcepath,config
-    pickle_in = open("cve_commitelement_"+branch+"_pickle",'rb')
+    pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
     cve_commitelement = pickle.load(pickle_in)
     extcommands = []
     for cve in cve_commitelement:
@@ -163,7 +163,7 @@ def generate_extcommands(branch):
 #generate match commands for reference kernels(mode 0 , 2 in Fiber), only need to be executed once (when there are multiple targets)
 def generate_matchcommands_ref(branch):
     global refsourcepath,refsourcepath,config
-    pickle_in = open("cve_commitelement_"+branch+"_pickle",'rb')
+    pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
     cve_commitelement = pickle.load(pickle_in)
     cve_beforecommits=get_beforepatchcommits(branch)
     matchcommands1 = []
@@ -181,7 +181,7 @@ def generate_matchcommands_ref(branch):
             localrefsourcepath = refsourcepath+'/'+cve+'/'+afterpatchcommit
             sigspath = localrefsourcepath
 
-            kernelpath = sigspath+'/patchkernel'
+            kernelpath = sigspath+'/refkernel'
             if not os.path.exists(kernelpath):
                 os.mkdir(kernelpath)
             copyfile(localrefkernelpath+'/boot',kernelpath+'/boot')
@@ -203,7 +203,7 @@ def generate_matchcommands_ref(branch):
 
 def generate_matchcommands_target(branch,targetkernelpath):
     global refsourcepath,refsourcepath,config
-    pickle_in = open("cve_commitelement_"+branch+"_pickle",'rb')
+    pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
     cve_commitelement = pickle.load(pickle_in)
 
     matchcommands = []
@@ -221,10 +221,10 @@ def generate_matchcommands_target(branch,targetkernelpath):
 if __name__ == '__main__':
     repo = sys.argv[1]
     branch = sys.argv[2]
-    #get_refsources(repo,branch)
-    #get_refkernels(repo,branch)
+    get_refsources(repo,branch)
+    get_refkernels(repo,branch)
     Get_debuginfo()
-    #get_patches(repo,branch)
-    #generate_pickcommands(branch)
-    #generate_extcommands(branch)
-    #generate_matchcommands_ref(branch)
+    get_patches(repo,branch)
+    generate_pickcommands(branch)
+    generate_extcommands(branch)
+    generate_matchcommands_ref(branch)

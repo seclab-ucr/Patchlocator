@@ -16,7 +16,7 @@ def _trim_lines(buf):
             buf[i] = buf[i][:-1]
 
 #given a CVE, locate the patch in a specific branch of specific repository
-def get_strict_patchcommits((month,cve,repo,commit),targetrepopath,targetbranch,commitlog):
+def get_strict_patchcommits((cve,repo,commit),targetrepopath,targetbranch,commitlog):
     patchkernel=helper_zz.get_repopath(repo)
     kernel=targetrepopath
     patchinfomation=helper_zz.get_commitinformation(patchkernel,commit)
@@ -162,7 +162,7 @@ def logresult(infolist):
     for info in infolist:
         line += str(info)+' '
     line = line[:-1]+'\n'
-    with open('upstreamresults/'+repo+'/'+branch,'a') as f:
+    with open('output/upstreamresults/'+repo+'/'+branch,'a') as f:
         f.write(line)
 
 #[target repo] [target branch] 
@@ -172,7 +172,7 @@ def patchlocator():
     with open('patchdic','r') as f:
         CVEinfo=f.readlines()
     Repo = sys.argv[1]
-    outputdir = 'upstreamresults/'+Repo
+    outputdir = 'output/upstreamresults/'+Repo
     if not os.path.exists(outputdir):
         os.mkdirs(outputdir)
     targetrepo=helper_zz.get_repopath(Repo)
@@ -189,11 +189,11 @@ def patchlocator():
         print line[:-1]
         line=line[:-1][1:-1]
         linelist=line.split(", ")
-        (month,cve,repo,commit)=(linelist[0][1:-1],linelist[1][1:-1],linelist[2][1:-1],linelist[3][1:-1])
+        (cve,repo,commit)=(linelist[1][1:-1],linelist[2][1:-1],linelist[3][1:-1])
         if Repo == "android" or Repo == "linux":
             if "linux" not in repo and "common" not in repo:
                 continue
-        (strictlist,fuzzlist)=get_strict_patchcommits((month,cve,repo,commit),targetrepo,targetbranch,commitlog)
+        (strictlist,fuzzlist)=get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog)
         if type(strictlist)==list:
             if len(strictlist) ==1 and len(fuzzlist)==0:
                 cve_strictcommit[cve]=strictlist[0]

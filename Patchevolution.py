@@ -103,9 +103,9 @@ def Patchevolution_tracker():
                 #later we can log corresponding before patch elemetn(filename/funcname) if they are not strictly the same
                 cve_commit_elements[cve][afterpatchcommit][element]=beforecommit
 
-    pickle_out = open("cve_functioncontent_"+branch+"_pickle","wb")
+    pickle_out = open("output/cve_functioncontent_"+branch+"_pickle","wb")
     pickle.dump(cve_functioncontent2,pickle_out)
-    pickle_out = open("cve_commitelement_"+branch+"_pickle","wb")
+    pickle_out = open("output/cve_commitelement_"+branch+"_pickle","wb")
     pickle.dump(cve_commit_elements,pickle_out)
 
 
