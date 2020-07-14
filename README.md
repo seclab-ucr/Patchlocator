@@ -67,12 +67,16 @@ This command set environment variables required for compiling. You can use the p
 - *get_patches()*: used for getting patch file. (for each CVE, each reference kernel).
 
 - *generate_pickcommands()*: generate commands used in Fiber pick phase.
+
 **output**: Fiberinputs/pickcommands
 - *generate_extcommands()*: generate commands used in Fiber extract phase.
+
 **output**: Fiberinputs/extcommands
 - *generate_matchcommands_ref()*: generate match commands for reference kernels(mode 0 , 2 in Fiber).
+
 **output**: Fiberinputs/matchcommands_ref
 - *generate_matchcommands_target()*: generate match commands for target kernels(mode 0 , 2 in Fiber).
+
 **output**: Fiberinputs/matchcommands_targetkernel
 
 **Note**: when you have multiple target kernels with the same reference branch, you only need to execute generate_pickcommands()/generate_extcommands()/generate_matchcommands_ref once but execute generate_matchcommands_target() for each target.
@@ -81,8 +85,11 @@ Finally, you can execute the commands in E-Fiber directory, you can execute the 
 ## 0x4 Notes for other files
 
 **helper_zz.py**: stores some helper functions related to git repository.
+
 **src_parser.py**: stores some helper functions related to source code parse.
+
 **sym_table.py**: stores some helper functions related to symbol table.
 
 **compilekernels.py**: stores some helper functions related to kernel compilation.
+
 **get_debuginfo.py**: stores some helper functions related to extracting and storing debug info files.
