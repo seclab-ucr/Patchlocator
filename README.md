@@ -11,11 +11,13 @@ Collect patch commits (manually or with the help of crawler) and store them in '
 Download kernel repository, including:
 1) The original reference kernel where the patch commit exists, for example, linux. We can extract information of patch from it.
 2) The reference/target kernel where we need to locate/track the patch. 
-3) (optional) the target source code snapshot.
+3) (optional) the target source code snapshot/binary image.
+
 **Note**: Hardcode the repo paths in helper_zz.py get_repopath()
 
 ## 0x1 repository target
 **required**: patchdic. patchdic should contains patch name (for example, CVE number), corresponding repository name (for example, linux), and corresponding commit number. We contain an example file which contains some CVEs in Android security bulletin. 
+
 `~/Patchlocator$ python Patchlocator.py [repo] [branch]`
 
 - *repo*: target repo name. For example, [msm-4.9](https://source.codeaurora.org/quic/la/kernel/msm-4.9/)
@@ -25,18 +27,23 @@ Download kernel repository, including:
 ~/Patchlocator/output/upstreamresults/repo/branch. For example, output/upstreamresults/msm-4.9/kernel.lnx.4.9.r25-rel
 
 ## 0x2 source code target
-### step1:patch evolution in reference branch
+### step1: patch evolution in reference branch
 **required**: upstreamresults/repo/branch
 `~/Patchlocator$ python Patchevolution.py [repo] [branch]`
 
 **output**:
-1)cve_functioncontent_[branch+]_pickle. For example. output/cve_functioncontent_kernel.lnx.4.9.r25-rel_pickle.
-used as input of step2
-2)cve_commitelement_[branch+]_pickle. For example, output/cve_commitelement_kernel.lnx.4.9.r25-rel_pickle
-used as input of 0x3
 
-### step2:match with target source code snapshot
+1)cve_functioncontent_[branch+]_pickle. For example. output/cve_functioncontent_kernel.lnx.4.9.r25-rel_pickle.
+
+Used as input of step2
+
+2)cve_commitelement_[branch+]_pickle. For example, output/cve_commitelement_kernel.lnx.4.9.r25-rel_pickle
+
+Used as input of 0x3
+
+### step2: match with target source code snapshot
 **required**: cve_functioncontent_[branch+]_pickle
+
 `~/Patchlocator$ python Patchmatcher_src.py [branch] [targetkernel]`
 
 - *targetkernel*: path to target source code kernel
