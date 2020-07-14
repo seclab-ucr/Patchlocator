@@ -10,7 +10,7 @@ from shutil import copyfile
 #directory that stores reference kernel source code
 refsourcepath = os.getcwd()+'/Fiberinputs/refsources'
 #directory that stores reference kernel binary/symbol table/vmlinux/debuginfo
-refkernelpath = os.getcwd()+'/Fiberinputs/refkernels' 
+refkernelpath = os.getcwd()+'/Fiberinputs/refkernels'
 #the config file name when compiling reference kernel
 config='sdm845-perf'
 def get_refsources(repo,branch):
@@ -31,7 +31,7 @@ def get_refsources(repo,branch):
             if not os.path.exists(commitpath):
                 os.mkdir(commitpath)
             for (filename,funcname) in cve_commitelement[cve][afterpatchcommit]:
-                #print filename,funcname
+                print filename
                 directorypath = commitpath+'/'+'/'.join(filename.split('/')[:-1])
                 if not os.path.exists(directorypath):
                     os.makedirs(directorypath)
@@ -50,9 +50,11 @@ def get_refkernels(repo,branch):
     for cve in cve_commitelement:
         for afterpatchcommit in cve_commitelement[cve]:
             commitlist += [afterpatchcommit]
-            for element in cve_commitelement[cve]:
-                beforecommit = cve_commitelement[cve][element]
+            for element in cve_commitelement[cve][afterpatchcommit]:
+                beforecommit = cve_commitelement[cve][afterpatchcommit][element]
                 break
+            print beforecommit
+            commitlist += [beforecommit]
     commitlist = list(set(commitlist))
     compilekernels.compile_kernel(repo,commitlist,config,refkernelpath)
 
@@ -104,6 +106,7 @@ def get_beforepatchcommits(branch):
 
 #we put the patches in the same dir as refsources
 def get_patches(repo,branch):
+    print 'get_patches:'
     pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
     cve_commitelement = pickle.load(pickle_in)
     cve_beforecommits = get_beforepatchcommits(branch)
@@ -229,11 +232,13 @@ def generate_matchcommands_target(branch,targetkernelpath):
 if __name__ == '__main__':
     repo = sys.argv[1]
     branch = sys.argv[2]
-    get_refsources(repo,branch)
+    #get_refsources(repo,branch)
     get_refkernels(repo,branch)
+    
     Get_debuginfo()
-    get_patches(repo,branch)
-    generate_pickcommands(branch)
-    generate_extcommands(branch)
-    generate_matchcommands_ref(branch)
-    generate_matchcommands_target(branch,sys.argv[3])
+    #get_patches(repo,branch)
+    
+    #generate_pickcommands(branch)
+    #generate_extcommands(branch)
+    #generate_matchcommands_ref(branch)
+    #generate_matchcommands_target(branch,sys.argv[3])
