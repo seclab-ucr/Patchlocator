@@ -15,14 +15,14 @@ Download kernel repository, including:
 **Note**: Hardcode the repo paths in helper_zz.py get_repopath()
 
 ## 0x1 repository target
-**required**: patchdic. patchdic should contains patch name (for example, CVE number), corresponding repository name (for example, linux), and corresponding commit number. 
+**required**: patchdic. patchdic should contains patch name (for example, CVE number), corresponding repository name (for example, linux), and corresponding commit number. We contain an example file which contains some CVEs in Android security bulletin. 
 `~/Patchlocator$ python Patchlocator.py [repo] [branch]`
 
-- *repo*: target repo name. 
-- *branch*: target branch name.
+- *repo*: target repo name. For example, [msm-4.9](https://source.codeaurora.org/quic/la/kernel/msm-4.9/)
+- *branch*: target branch name. For example, kernel.lnx.4.9.r25-rel. From the tag "LA.UM.8.3.r1", we know it corresponds [snapdragon 845, Android 10](https://wiki.codeaurora.org/xwiki/bin/QAEP/release). 
 
 **output**:
-~/Patchlocator/upstreamresults/repo/branch
+~/Patchlocator/output/upstreamresults/repo/branch. For example, output/upstreamresults/msm-4.9/kernel.lnx.4.9.r25-rel
 
 ## 0x2 source code target
 ### step1:patch evolution in reference branch
@@ -30,9 +30,9 @@ Download kernel repository, including:
 `~/Patchlocator$ python Patchevolution.py [repo] [branch]`
 
 **output**:
-1)cve_functioncontent_[branch+]_pickle
+1)cve_functioncontent_[branch+]_pickle. For example. output/cve_functioncontent_kernel.lnx.4.9.r25-rel_pickle.
 used as input of step2
-2)cve_commitelement_[branch+]_pickle
+2)cve_commitelement_[branch+]_pickle. For example, output/cve_commitelement_kernel.lnx.4.9.r25-rel_pickle
 used as input of 0x3
 
 ### step2:match with target source code snapshot
@@ -46,7 +46,7 @@ used as input of 0x3
 
 ## 0x3 binary image target
 
-If the target kernel is a binary image, we needs to make use of Fiber, please follow[E-Fiber](https://github.com/zhangzhenghsy/fiber-1/tree/E-Fiber). To make things easier for users, we prepare a script (Fiberinput.py) for generating inputs of E-Fiber as well as the corresponding Fiber commands.
+If the target kernel is a binary image, we needs to make use of Fiber, please follow[E-Fiber](https://github.com/zhangzhenghsy/fiber-1/tree/E-Fiber). To make things easier for users, we prepare a script (Fiberinput.py) to generate inputs of E-Fiber (reference source code/binary image,debug info...) as well as the corresponding Fiber commands.
 
 **required**: cve_commitelement_[branch+]_pickle
 `~/Patchlocator$ python Fiberinput.py [repo] [branch] [target kernel path]`
@@ -62,7 +62,7 @@ In Fiberinput.py there are 8 functions, you should execute them in order. [targe
 - *get_refkernels()*: used for getting binary image/symbol table/vmlinux of reference kernel. We will compile reference kernels here.
 **Note**: Before execute get_refkernels(). Please execute the following command in advance.
 `~/Patchlocator$ source ./environ.sh`
-This command set environment variables required for compiling. You can use the provided GCC in tools directory or download GCC by yourself and hard-code the path in environ.sh.
+This command set environment variables required for compiling. You can use the provided GCC in tools directory () or download official GCC and hard-code the path in environ.sh.
 - *Get_debuginfo()*: used for extracting debug info from vmlinux. You can use the provided addr2line in tools directory or download GCC by yourself and hard-code the path in environ.sh. 
 - *get_patches()*: used for getting patch file. (for each CVE, each reference kernel).
 
@@ -77,7 +77,7 @@ This command set environment variables required for compiling. You can use the p
 
 **Note**: when you have multiple target kernels with the same reference branch, you only need to execute generate_pickcommands()/generate_extcommands()/generate_matchcommands_ref once but execute generate_matchcommands_target() for each target.
 
-
+Finally, you can execute the commands in E-Fiber directory, you can execute the commands in parallel to speed up the process. 
 ## 0x4 Notes for other files
 
 **helper_zz.py**: stores some helper functions related to git repository.
@@ -86,5 +86,3 @@ This command set environment variables required for compiling. You can use the p
 
 **compilekernels.py**: stores some helper functions related to kernel compilation.
 **get_debuginfo.py**: stores some helper functions related to extracting and storing debug info files.
-**tools**: gcc and addr2line. Used in compilekernels.py and get_debuginfo.py
-
