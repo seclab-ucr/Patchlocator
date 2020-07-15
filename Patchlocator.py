@@ -18,7 +18,6 @@ def _trim_lines(buf):
 #given a CVE, locate the patch in a specific branch of specific repository
 def get_strict_patchcommits((cve,repo,commit),targetrepopath,targetbranch,commitlog):
     patchkernel=helper_zz.get_repopath(repo)
-    kernel=targetrepopath
     patchinfomation=helper_zz.get_commitinformation(patchkernel,commit)
     Author=patchinfomation['author']
     authortime=patchinfomation['authortime']
@@ -64,7 +63,7 @@ def get_strict_patchcommits((cve,repo,commit),targetrepopath,targetbranch,commit
     for file_name in patchfiles:
         if file_name.endswith("\r"):
             file_name=file_name[:-1]
-        (local_candidates,newfilename)=helper_zz.get_candidate_commitnumbers2(kernel, file_name)
+        (local_candidates,newfilename)=helper_zz.get_candidate_commitnumbers2(targetrepopath, file_name)
         if newfilename.startswith('./'):
             newfilename=newfilename[2:]
         if len(local_candidates) >0:
@@ -92,7 +91,7 @@ def get_strict_patchcommits((cve,repo,commit),targetrepopath,targetbranch,commit
     filterbydate=0
     for (commitcandidate, (notmatch,strictmatch,fuzzmatch)) in resultlist:
         commitcandidate=commitcandidate[:12]
-        information=helper_zz.get_commitinformation(kernel,commitcandidate)
+        information=helper_zz.get_commitinformation(targetrepopath,commitcandidate)
         if determinebyintro(simpleintroduction,information):
             strictcommits.add(commitcandidate)
             continue
@@ -112,14 +111,14 @@ def get_strict_patchcommits((cve,repo,commit),targetrepopath,targetbranch,commit
     #this CVE may be patched when initialization
     if len(strictcommits)==0 and len(fuzzcommits)==0:
         #try to check if patched in initial commit'
-        initcommit=get_initcommit(kernel,patchfiles)
+        initcommit=get_initcommit(targetrepopath,patchfiles)
         if initcommit:
             #checkout the files when initialization
-            updatedfiles=helper_zz.checkoutfiles_commit(kernel,initcommit,patchfiles)
+            updatedfiles=helper_zz.checkoutfiles_commit(targetrepopath,initcommit,patchfiles)
             #match the change sites
-            inf=src_parser.parse_patch(patchPath,kernel,changefiles2)
+            inf=src_parser.parse_patch(patchPath,targetrepopath,changefiles2)
             #restore the files of target branch
-            updatedfiles=helper_zz.checkoutfiles_commit(kernel,targetbranch,patchfiles)
+            updatedfiles=helper_zz.checkoutfiles_commit(targetrepopath,targetbranch,patchfiles)
             if len(inf) >0:
                 logresult([cve,'should be patched in initial commit',initcommit])
                 return ([initcommit],[])
