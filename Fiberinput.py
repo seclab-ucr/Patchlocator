@@ -31,7 +31,6 @@ def get_refsources(repo,branch):
             if not os.path.exists(commitpath):
                 os.mkdir(commitpath)
             for (filename,funcname) in cve_commitelement[cve][afterpatchcommit]:
-                print filename
                 directorypath = commitpath+'/'+'/'.join(filename.split('/')[:-1])
                 if not os.path.exists(directorypath):
                     os.makedirs(directorypath)
@@ -53,7 +52,6 @@ def get_refkernels(repo,branch):
             for element in cve_commitelement[cve][afterpatchcommit]:
                 beforecommit = cve_commitelement[cve][afterpatchcommit][element]
                 break
-            print beforecommit
             commitlist += [beforecommit]
     commitlist = list(set(commitlist))
     compilekernels.compile_kernel(repo,commitlist,config,refkernelpath)
@@ -232,13 +230,13 @@ def generate_matchcommands_target(branch,targetkernelpath):
 if __name__ == '__main__':
     repo = sys.argv[1]
     branch = sys.argv[2]
-    #get_refsources(repo,branch)
+    get_refsources(repo,branch)
     get_refkernels(repo,branch)
     
     Get_debuginfo()
-    #get_patches(repo,branch)
+    get_patches(repo,branch)
     
-    #generate_pickcommands(branch)
-    #generate_extcommands(branch)
-    #generate_matchcommands_ref(branch)
-    #generate_matchcommands_target(branch,sys.argv[3])
+    generate_pickcommands(branch)
+    generate_extcommands(branch)
+    generate_matchcommands_ref(branch)
+    generate_matchcommands_target(branch,sys.argv[3])

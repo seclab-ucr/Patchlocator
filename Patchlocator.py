@@ -36,7 +36,7 @@ def get_strict_patchcommits((cve,repo,commit),targetrepopath,targetbranch,commit
         return [notecandidates[-1]+' '+maincommit],[]
 
     #If no results from introduction, we need to use content of patch to locate the patch commit
-    helper_zz.checkoutcommit(patchkernel,targetbranch)
+    helper_zz.checkoutcommit(targetrepopath,targetbranch)
     if not os.path.exists('patches'):
         os.mkdir('patches')
     patchPath="patches/"+cve
