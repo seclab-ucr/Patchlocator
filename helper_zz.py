@@ -640,15 +640,13 @@ def get_newfuncname(repopath,commit,filename1,filename2,prevfuncname):
 
 
 #given a commit and a repo branch, try to get the corresponding commit in main branch.
-def get_maincommit(repopath,branch,commit,filename=None):
-    candidate_commitnumberslist=get_candidate_commitnumbers3(repopath,branch)
-    if commit in candidate_commitnumberslist:
-        return commit
-    string1='cd '+repopath+';git find-merge '+commit+' '+branch
-    result=command(string1)
-    maincommit=result[0][:12]
-    #print 'maincommit:',maincommit
-    return maincommit
+def get_maincommit2(repopath,branch,commit):
+    string1='cd '+repopath+';git rev-list '+commit+'..'+branch+' --ancestry-path'
+    resultlist1=command(string1)
+    string1='cd '+repopath+';git rev-list '+commit+'..'+branch+' --first-parent'
+    resultlist2=command(string1)
+    commoncommitlist = [commit for commit in resultlist1 if commit in resultlist2]
+    return commoncommitlist[-1][:12]
 
 def command(string1):
     p=subprocess.Popen(string1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
