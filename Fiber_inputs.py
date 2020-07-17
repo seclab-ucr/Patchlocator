@@ -47,10 +47,10 @@ def get_refkernels(repo,branch):
     cve_commit_element_content = pickle.load(pickle_in)
     commitlist = []
     for cve in cve_commit_element_content:
+        beforecommit = cve_commit_element_content[cve]['beforecommit']
+        commitlist += [beforecommit]
         for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
             commitlist += [afterpatchcommit]
-            beforecommit = cve_commit_element_content[cve]['beforecommit']
-            commitlist += [beforecommit]
     commitlist = list(set(commitlist))
     compilekernels.compile_kernel(repo,commitlist,config,refkernelpath)
 
@@ -87,27 +87,17 @@ def generatepatchfile(repo,nopatchcommit,patchcommit,elementset):
         totalpatchfile += p_buf2
     return totalpatchfile
 
-def get_beforepatchcommits(branch):
-    cve_beforecommits={}
-    pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
-    cve_commit_element_content = pickle.load(pickle_in)
-    for cve in cve_commit_element_content:
-        beforecommit = cve_commit_element_content[cve]['beforecommit']
-        cve_beforecommits[cve] = beforecommit
-    return cve_beforecommits
-
 #we put the patches in the same dir as refsources
 def get_patches(repo,branch):
     print 'get_patches:'
     pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
     cve_commit_element_content = pickle.load(pickle_in)
-    cve_beforecommits = get_beforepatchcommits(branch)
     for cve in cve_commit_element_content:
         print cve
         cvepath = refsourcepath+'/'+cve
+        beforecommit = cve_commit_element_content[cve]['beforecommit']
         for afterpatchcommit in cve_commit_element_content[cve]['afterpatchcommits']:
             commitpath = cvepath+'/'+afterpatchcommit
-            beforecommit = cve_beforecommits[cve]
             elementset = cve_commit_element_content[cve]['afterpatchcommits'][afterpatchcommit].keys()
             patchfile = generatepatchfile(repo,beforecommit,afterpatchcommit,elementset)
             if not patchfile:
@@ -160,13 +150,12 @@ def generate_matchcommands_ref(branch):
     global refsourcepath,refsourcepath,config
     pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
     cve_commit_element_content = pickle.load(pickle_in)
-    cve_beforecommits=get_beforepatchcommits(branch)
     matchcommands1 = []
     matchcommands2 = []
 
     for cve in cve_commit_element_content:
         print cve
-        beforepatchcommit = cve_beforecommits[cve]
+        beforepatchcommit = cve_commit_element_content[cve]['beforecommit']
         unpatchkernelpath = refkernelpath+'/'+beforepatchcommit+'_'+config
         if not os.path.exists(unpatchkernelpath):
             print 'no compiled beforepatch commit:',beforepatchcommit
