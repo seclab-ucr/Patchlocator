@@ -21,7 +21,7 @@ def compare_sourcecode(branch,targetpath):
                 refcontent=cve_commit_element_content[cve]['aftercommits'][afterpatchcommit][(filename,funcname)]
                 targetcontents=helper_zz.get_function_content(targetpath,filename,funcname)
                 if len(targetcontents)>0:
-                    result='NE'
+                    result='N'
                     if refcontent in targetcontents:
                         result='P'
                         break
@@ -30,7 +30,7 @@ def compare_sourcecode(branch,targetpath):
         cve_result[cve]=result
         if result== 'P':
             countTrue +=1
-        elif result=='NE':
+        elif result=='N':
             countFalse +=1
             Falselist += [cve]
         elif result=='None':
@@ -55,12 +55,12 @@ def comparewithgroundtruth():
         if cve in cve_discarded:
             continue
         result=line.split(' ')[1]
-        if result in ['P','NE','None']:
+        if result in ['P','N','None']:
             cve_result1[cve]=result 
         elif result=='True':
             cve_result1[cve]='P'
         elif result=='False' or result=='N':
-            cve_result1[cve]='NE'
+            cve_result1[cve]='N'
         elif result == 'None':
             cve_result1[cve]='None'
         else:
@@ -73,12 +73,12 @@ def comparewithgroundtruth():
         line=line[:-1]
         cve=line.split(' ')[0]
         result=line.split(' ')[1]
-        if result in ['P','NE','None']:
+        if result in ['P','N','None']:
             cve_result2[cve]=result
         if result=='True':
             cve_result2[cve]='P'
         elif result=='False' or result=='N':
-            cve_result2[cve]='NE'
+            cve_result2[cve]='N'
         elif result == 'None':
             cve_result2[cve]='None'
     
@@ -96,7 +96,7 @@ def comparewithgroundtruth():
                 truepositive += [cve]
             else:
                 falsepositive += [cve]
-        elif result=='NE':
+        elif result=='N':
             if result==cve_result2[cve]:
                 truenegative += [cve]
             else:
