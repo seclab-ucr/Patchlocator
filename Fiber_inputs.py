@@ -1,5 +1,5 @@
 #this file is used for generating inputs of fiber
-#input the "cve_commitelement_"+branch+"_pickle" from patchevolution.py
+#input the "Patch_evolution_"+branch+"_pickle" from patchevolution.py
 import helper_zz
 import compilekernels
 import get_debuginfo
@@ -18,19 +18,19 @@ def get_refsources(repo,branch):
     global refsourcepath
     if not os.path.exists(refsourcepath):
         os.makedirs(refsourcepath)
-    pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
-    cve_commitelement = pickle.load(pickle_in)
-    for cve in cve_commitelement:
+    pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
+    cve_commit_element_content = pickle.load(pickle_in)
+    for cve in cve_commit_element_content:
         print 'get reference kernel source code for',cve
         cvepath = refsourcepath+'/'+cve
         if not os.path.exists(cvepath):
             os.mkdir(cvepath)
-        for afterpatchcommit in cve_commitelement[cve]:
+        for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
             print afterpatchcommit
             commitpath = cvepath+'/'+afterpatchcommit
             if not os.path.exists(commitpath):
                 os.mkdir(commitpath)
-            for (filename,funcname) in cve_commitelement[cve][afterpatchcommit]:
+            for (filename,funcname) in cve_commit_element_content[cve]['aftercommits'][afterpatchcommit]:
                 directorypath = commitpath+'/'+'/'.join(filename.split('/')[:-1])
                 if not os.path.exists(directorypath):
                     os.makedirs(directorypath)
@@ -43,15 +43,13 @@ def get_refkernels(repo,branch):
     global refkernelpath,config
     if not os.path.exists(refkernelpath):
         os.makedirs(refkernelpath)
-    pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
-    cve_commitelement = pickle.load(pickle_in)
+    pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
+    cve_commit_element_content = pickle.load(pickle_in)
     commitlist = []
-    for cve in cve_commitelement:
-        for afterpatchcommit in cve_commitelement[cve]:
+    for cve in cve_commit_element_content:
+        for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
             commitlist += [afterpatchcommit]
-            for element in cve_commitelement[cve][afterpatchcommit]:
-                beforecommit = cve_commitelement[cve][afterpatchcommit][element]
-                break
+            beforecommit = cve_commit_element_content[cve]['beforecommit']
             commitlist += [beforecommit]
     commitlist = list(set(commitlist))
     compilekernels.compile_kernel(repo,commitlist,config,refkernelpath)
@@ -91,30 +89,26 @@ def generatepatchfile(repo,nopatchcommit,patchcommit,elementset):
 
 def get_beforepatchcommits(branch):
     cve_beforecommits={}
-    pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
-    cve_commitelement = pickle.load(pickle_in)
-    for cve in cve_commitelement:
-        for afterpatchcommit in cve_commitelement[cve]:
-            for element in cve_commitelement[cve][afterpatchcommit]:
-                beforecommit = cve_commitelement[cve][afterpatchcommit][element]
-                break
-            break
+    pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
+    cve_commit_element_content = pickle.load(pickle_in)
+    for cve in cve_commit_element_content:
+        beforecommit = cve_commit_element_content[cve]['beforecommit']
         cve_beforecommits[cve] = beforecommit
     return cve_beforecommits
 
 #we put the patches in the same dir as refsources
 def get_patches(repo,branch):
     print 'get_patches:'
-    pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
-    cve_commitelement = pickle.load(pickle_in)
+    pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
+    cve_commit_element_content = pickle.load(pickle_in)
     cve_beforecommits = get_beforepatchcommits(branch)
-    for cve in cve_commitelement:
+    for cve in cve_commit_element_content:
         print cve
         cvepath = refsourcepath+'/'+cve
-        for afterpatchcommit in cve_commitelement[cve]:
+        for afterpatchcommit in cve_commit_element_content[cve]['afterpatchcommits']:
             commitpath = cvepath+'/'+afterpatchcommit
             beforecommit = cve_beforecommits[cve]
-            elementset = cve_commitelement[cve][afterpatchcommit].keys()
+            elementset = cve_commit_element_content[cve]['afterpatchcommits'][afterpatchcommit].keys()
             patchfile = generatepatchfile(repo,beforecommit,afterpatchcommit,elementset)
             if not patchfile:
                 print 'dont get patchfile for',afterpatchcommit,'beforecommit:',beforecommit
@@ -126,12 +120,12 @@ def get_patches(repo,branch):
 #generate commands used in Fiber pick phase
 def generate_pickcommands(branch):
     global refsourcepath,refsourcepath,config
-    pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
-    cve_commitelement = pickle.load(pickle_in)
+    pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
+    cve_commit_element_content = pickle.load(pickle_in)
     pickcommands = []
-    for cve in cve_commitelement:
+    for cve in cve_commit_element_content:
         print cve
-        for afterpatchcommit in cve_commitelement[cve]:
+        for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
             localrefsourcepath = refsourcepath+'/'+cve+'/'+afterpatchcommit
             localrefkernelpath = refkernelpath+'/'+afterpatchcommit+'_'+config
             outputpath = localrefsourcepath
@@ -147,12 +141,12 @@ def generate_pickcommands(branch):
 #generate commands used in Fiber extract phase
 def generate_extcommands(branch):
     global refsourcepath,refsourcepath,config
-    pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
-    cve_commitelement = pickle.load(pickle_in)
+    pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
+    cve_commit_element_content = pickle.load(pickle_in)
     extcommands = []
-    for cve in cve_commitelement:
+    for cve in cve_commit_element_content:
         print cve
-        for afterpatchcommit in cve_commitelement[cve]:
+        for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
             localrefkernelpath = refkernelpath+'/'+afterpatchcommit+'_'+config
             localrefsourcepath = refsourcepath+'/'+cve+'/'+afterpatchcommit
             extcommand = 'python ext_sig.py '+localrefkernelpath+' '+localrefsourcepath
@@ -164,20 +158,20 @@ def generate_extcommands(branch):
 #generate match commands for reference kernels(mode 0 , 2 in Fiber), only need to be executed once (when there are multiple targets)
 def generate_matchcommands_ref(branch):
     global refsourcepath,refsourcepath,config
-    pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
-    cve_commitelement = pickle.load(pickle_in)
+    pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
+    cve_commit_element_content = pickle.load(pickle_in)
     cve_beforecommits=get_beforepatchcommits(branch)
     matchcommands1 = []
     matchcommands2 = []
 
-    for cve in cve_commitelement:
+    for cve in cve_commit_element_content:
         print cve
         beforepatchcommit = cve_beforecommits[cve]
         unpatchkernelpath = refkernelpath+'/'+beforepatchcommit+'_'+config
         if not os.path.exists(unpatchkernelpath):
             print 'no compiled beforepatch commit:',beforepatchcommit
             continue
-        for afterpatchcommit in cve_commitelement[cve]:
+        for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
             localrefkernelpath = refkernelpath+'/'+afterpatchcommit+'_'+config
             localrefsourcepath = refsourcepath+'/'+cve+'/'+afterpatchcommit
             sigspath = localrefsourcepath
@@ -212,13 +206,13 @@ def generate_matchcommands_target(branch,targetkernelpath):
         result=helper_zz.command(string1)
 
     global refsourcepath,refsourcepath,config
-    pickle_in = open("output/cve_commitelement_"+branch+"_pickle",'rb')
-    cve_commitelement = pickle.load(pickle_in)
+    pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
+    cve_commit_element_content = pickle.load(pickle_in)
 
     matchcommands = []
-    for cve in cve_commitelement:
+    for cve in cve_commit_element_content:
         print cve
-        for afterpatchcommit in cve_commitelement[cve]:
+        for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
             sigspath = refsourcepath+'/'+cve+'/'+afterpatchcommit
             matchcommand = 'python match_sig.py '+sigspath+' 1 '+targetkernelpath
             matchcommands += [matchcommand]
