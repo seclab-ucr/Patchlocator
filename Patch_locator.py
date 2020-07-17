@@ -78,7 +78,6 @@ def get_strict_patchcommits((cve,repo,commit),targetrepopath,targetbranch,commit
         #    logresult([cve,file_name,'not exist in this branch log and we dont find substitution'])
     
     patchfiles=newpatchfiles
-    print 'commitcandidates:',commitcandidates
     if len(commitcandidates)==0:
         return (None,None)
     commitcandidateslist = [(commitcandidate,p_buf,targetrepopath) for commitcandidate in commitcandidates]
@@ -122,9 +121,8 @@ def get_strict_patchcommits((cve,repo,commit),targetrepopath,targetbranch,commit
             #restore the files of target branch
             updatedfiles=helper_zz.checkoutfiles_commit(targetrepopath,targetbranch,patchfiles)
             if len(inf) >0:
-                logresult([cve,'should be patched in initial commit',initcommit])
-                return ([initcommit],[])
-    print list(strictcommits),list(fuzzcommits)
+                #logresult([cve,'should be patched in initial commit',initcommit])
+                return (['initialization commit '+initcommit],[])
     return (list(strictcommits),list(fuzzcommits))
 
 def get_initcommit(kernel,patchfiles):
@@ -196,7 +194,7 @@ def patchlocator():
         if type(strictlist)==list:
             if len(strictlist) ==1 and len(fuzzlist)==0:
                 cve_strictcommit[cve]=strictlist[0]
-                logresult([cve,strictlist[0],helper_zz.get_commitdate(targetrepopath,strictlist[0].split(' ')[-1]),repo])
+                logresult([cve,strictlist[0],helper_zz.get_commitdate(targetrepopath,strictlist[0].split(' ')[-1])])
             else:
                 logresult([cve,strictlist,fuzzlist])
         elif strictlist==None:

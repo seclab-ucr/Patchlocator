@@ -3,10 +3,10 @@ import helper_zz
 import pickle
 
 def compare_sourcecode(branch,targetpath):
-    filepath='./output/cve_functioncontent_'+branch+'_pickle'
+    filepath='./output/Patch_evolution_'+branch+'_pickle'
     pickle_in=open(filepath,'rb')
-    cve_functioncontent=pickle.load(pickle_in)
-    cvelist=[cve for cve in cve_functioncontent]
+    cve_commit_element_content=pickle.load(pickle_in)
+    cvelist=[cve for cve in cve_commit_element_content]
     cvelist.sort()
     cve_result={}
     outputfile=targetpath+'/matchresults'
@@ -14,16 +14,19 @@ def compare_sourcecode(branch,targetpath):
     countFalse=0
     countNone=0
     Falselist=[]
-    for cve in cve_functioncontent:
+    for cve in cve_commit_element_content:
         result='None'
-        for (filename,funcname) in cve_functioncontent[cve]:
-            refcontents=cve_functioncontent[cve][(filename,funcname)]
-            targetcontent=helper_zz.get_function_content(targetpath,filename,funcname)
-            if len(targetcontent)>0:
-                result='NE'
-                if any(content in refcontents for content in targetcontent):
-                    result='P'
-                    break
+        for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
+            for (filename,funcname) in cve_commit_element_content[cve]['aftercommits'][afterpatchcommit]:
+                refcontent=cve_commit_element_content[cve]['aftercommits'][afterpatchcommit][(filename,funcname)]
+                targetcontents=helper_zz.get_function_content(targetpath,filename,funcname)
+                if len(targetcontents)>0:
+                    result='NE'
+                    if refcontent in targetcontents:
+                        result='P'
+                        break
+            if result == 'P':
+                break
         cve_result[cve]=result
         if result== 'P':
             countTrue +=1

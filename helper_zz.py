@@ -640,7 +640,7 @@ def get_newfuncname(repopath,commit,filename1,filename2,prevfuncname):
 
 
 #given a commit and a repo branch, try to get the corresponding commit in main branch.
-def get_maincommit2(repopath,branch,commit):
+def get_maincommit(repopath,branch,commit):
     string1='cd '+repopath+';git rev-list '+commit+'..'+branch+' --ancestry-path'
     resultlist1=command(string1)
     string1='cd '+repopath+';git rev-list '+commit+'..'+branch+' --first-parent'
