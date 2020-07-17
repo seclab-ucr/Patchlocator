@@ -2,11 +2,10 @@ import os,sys
 import helper_zz
 from shutil import copyfile
 def compile_kernel(repo,commitlist,config,refkernelpath):
-    print len(commitlist)
     kernel=helper_zz.get_repopath(repo)
 
     for commit in commitlist:
-        print commit
+        print 'compile kernel',repo,commit,'with config',config
         string1='cd '+kernel+';git checkout -f '+commit
         helper_zz.command(string1)
         configdir=kernel+'/arch/arm64/configs/'

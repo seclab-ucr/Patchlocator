@@ -26,7 +26,6 @@ def get_refsources(repo,branch):
         if not os.path.exists(cvepath):
             os.mkdir(cvepath)
         for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
-            print afterpatchcommit
             commitpath = cvepath+'/'+afterpatchcommit
             if not os.path.exists(commitpath):
                 os.mkdir(commitpath)
@@ -96,9 +95,9 @@ def get_patches(repo,branch):
         print cve
         cvepath = refsourcepath+'/'+cve
         beforecommit = cve_commit_element_content[cve]['beforecommit']
-        for afterpatchcommit in cve_commit_element_content[cve]['afterpatchcommits']:
+        for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
             commitpath = cvepath+'/'+afterpatchcommit
-            elementset = cve_commit_element_content[cve]['afterpatchcommits'][afterpatchcommit].keys()
+            elementset = cve_commit_element_content[cve]['aftercommits'][afterpatchcommit].keys()
             patchfile = generatepatchfile(repo,beforecommit,afterpatchcommit,elementset)
             if not patchfile:
                 print 'dont get patchfile for',afterpatchcommit,'beforecommit:',beforecommit
@@ -114,7 +113,7 @@ def generate_pickcommands(branch):
     cve_commit_element_content = pickle.load(pickle_in)
     pickcommands = []
     for cve in cve_commit_element_content:
-        print cve
+        print 'generate pickcommands of Fiber for',cve
         for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
             localrefsourcepath = refsourcepath+'/'+cve+'/'+afterpatchcommit
             localrefkernelpath = refkernelpath+'/'+afterpatchcommit+'_'+config
@@ -135,7 +134,7 @@ def generate_extcommands(branch):
     cve_commit_element_content = pickle.load(pickle_in)
     extcommands = []
     for cve in cve_commit_element_content:
-        print cve
+        print 'generate extcommands of Fiber for',cve
         for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
             localrefkernelpath = refkernelpath+'/'+afterpatchcommit+'_'+config
             localrefsourcepath = refsourcepath+'/'+cve+'/'+afterpatchcommit
@@ -152,9 +151,9 @@ def generate_matchcommands_ref(branch):
     cve_commit_element_content = pickle.load(pickle_in)
     matchcommands1 = []
     matchcommands2 = []
-
+    
     for cve in cve_commit_element_content:
-        print cve
+        print 'generate matchcommands(ref kernels) of Fiber for',cve
         beforepatchcommit = cve_commit_element_content[cve]['beforecommit']
         unpatchkernelpath = refkernelpath+'/'+beforepatchcommit+'_'+config
         if not os.path.exists(unpatchkernelpath):
@@ -200,7 +199,7 @@ def generate_matchcommands_target(branch,targetkernelpath):
 
     matchcommands = []
     for cve in cve_commit_element_content:
-        print cve
+        print 'generate matchcommands(target kernel) for',cve
         for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
             sigspath = refsourcepath+'/'+cve+'/'+afterpatchcommit
             matchcommand = 'python match_sig.py '+sigspath+' 1 '+targetkernelpath

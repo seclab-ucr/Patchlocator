@@ -1,35 +1,37 @@
 ## Patchlocator
 
-Open source patch presence test system. Given a patch commit in upstream repository, check if the patch is applied in downstream repository/source code snapshots.
+Open source patch presence test system. Given a patch commit in upstream repository, check if the patch is applied in downstream kernels.
 
-If only binary image available, it can generate necessary inputs required by [E-Fiber](https://github.com/zhangzhenghsy/fiber-1/tree/E-Fiber), then we can make use of Fiber to generate binary signatures and match them with target binary image to get the results.
+There are three kinds of kernels:
 
-## 0x0 preparation
+1. Reposiroty. Patchlocator can make use of information of the patches (introductin message, commit date, changed lines, etc) to locate the corresponding commit in target repository. If the target kernel is a repository, please read section 0x0 and 0x1.
 
-1. Environment Setup
+2. Source code snapshots. Patchlocator can determine if a patch is applied in a source code snapshot. If the target kernel is a source code snapshot, please read section 0x0 and 0x1, 0x2 and 0x3.1. 
+
+3. Binary image snapshots. Patchlocator can determine if a patch is applied in a binary image with the helper of [E-Fiber](https://github.com/zhangzhenghsy/fiber-1/tree/E-Fiber). If the target kernel is a source code snapshot, please read section 0x0 and 0x1, 0x2 and 0x3.2.
+
+The key insight is that 1) The functions in downstream are usually similar with those in corresponding upstream kernels, thus we can extract information of patched functions in upstream kernels to determine if the function is patched in downstream kernels. 2)(For source/binary snapshot targets) After a patch is applied in upstream kernel, the patched function may evolve with time. The patched function in target kernel may be similar to any version of patched function in upstream.  To achieve higher accuracy we keep track of the patched functions in upstream kernel and extract information from multiple versions of patched functions. 
+
+## 0x0 Environment Setup
 
 The scripts are based on python2.7.
 
 Pygments modules required. `sudo pip install Pygments` to install it.
 
-2. Input file
-
-patches info file: collect patch commits (manually or with the help of crawler) and store them in a file (eg, patches_info), which is used as input of 0x1. Patches info file should contains basic information of patches we want to locate. Specifically, in each line of patches file, there is a patch name (for example, CVE number), a corresponding repository name (for example, linux), and a corresponding commit number. We prepare an example file (./patches_info) which contains some CVEs in Android security bulletin.
-
-3. Download kernel repositories.
-
-1) The original reference kernels in patches info file, for example, linux. We can extract information of patch from it.
-
-2) The reference/target reposotory where we want to locate/track the patches.
-
-**Note**: Please set the repo paths in helper_zz.py get_repopath() function. With this function we can get the path to repository directory with the repo name.  The repo names in get_repopath() shoud be consistent with the names in patches info file.
 
 4. Download target kernel snapshots (source code or binary inage) where we want to locate patches.
 
 The target source code snapshot/binary image where we want to locate the patches.
 
 ## 0x1 Locating patches in a repository branch.
-**required**: patches info file. It has been introduced in 0x0 section.
+**required**: 
+1. Patches info file. Patches info file should contains basic information of patches we want to locate. Specifically, in each line of patches file, there is a patch name (for example, CVE number), a corresponding repository name (for example, linux), and a corresponding commit number. We prepare an example file (./patches_info) which contains some CVEs in Android security bulletin.
+
+2. The patch-related repositories in Patches info file. We can extract information of patch from it.
+
+3. The repository where we want to locate patches.
+
+**Note**: Please set the repo paths in helper_zz.py get_repopath() function. With this function we can get the path to the directory where you download the repositories.  The repo names in get_repopath() should be consistent with those in patches info file.
 
 `~/Patchlocator$ python Patch_locator.py [repo] [branch] [patches info file]`
 
@@ -38,7 +40,7 @@ The target source code snapshot/binary image where we want to locate the patches
 - *patches info file*: Path to required patches info file mentioned above.
 
 **output**:
-~/Patchlocator/output/upstreamresults/repo/branch. For example, output/upstreamresults/msm-4.9/kernel.lnx.4.9.r25-rel. It stores the results of patch locating.
+~/Patchlocator/output/upstreamresults/repo/branch. It's a file that stores the results of patch locating for branch. For example, output/upstreamresults/msm-4.9/kernel.lnx.4.9.r25-rel.
 
 Here are some examples of lines in output file:
 
@@ -46,16 +48,23 @@ Here are some examples of lines in output file:
 
 CVE-2019-2287 is patched with commit f920e8539ff2, which is in the upstream of target branch. Then f920e8539ff2 is merged into target branch with the merge commit de6abb23dc05. The commit date of de6abb23dc05 is 2/22/2019, thus we think CVE-2019-2287 is patched in target branch (kernel.lnx.4.9.r25-rel) at 2/22/2019.
 
-2) CVE-2019-2328 None
+2) CVE-2019-10499 None
 
-We don't find patch-related files of CVE-2019-2328 in the branch. 
+We don't find patch-related files of CVE-2019-10499 in the branch. 
 
 3) CVE-2019-2331 [] []
 
 We find patch-related files of CVE-2019-2331 but we don't find the commit corresponding the patch in target branch.
 
+4) CVE-2019-2328 [] ['dce0f8189f75',...]
+
+We don't find the commit that can be strictly matched with the original patch commit. But we get several commits that may be related to the patch. The users can check them manually or ignore this patch for the moment.
+
 ## 0x2 Patch evolution tracker
-**required**: output/upstreamresults/repo/branch. It's the output file of 0x1. Thus 0x1 should be executed in advance. This file will be imported automatically thus the user doesn't need to set the path manually.
+**required**: 
+1. output/upstreamresults/repo/branch. It's the output file of 0x1. Thus 0x1 should be executed in advance. This file will be imported automatically thus the user doesn't need to set the path manually.
+
+2. The repository where we want to track evolutions of the patches. It should be the target repo in 0x1. (Only after we locate the patch we can keep track of it).
 
 `~/Patchlocator$ python Patch_evolution.py [repo] [branch] [patches info file]`
 
@@ -66,9 +75,12 @@ Patch_evolution_[branch]_pickle. It's a file containing results of patch evoluti
 
 ## 0x3.1 Locating patches in a source code snapshot
 
-If the target kernel is a source code snapshot, it tries to match each patched function  version (identified  by  the  patch evolution tracker) to the target function.
+If the target kernel is a source code snapshot, we try to match each version of patch function (identified by the patch evolution tracker) with the target function. If any of them matches, we think the patch has been applied to target source code snapshot.
 
-**required**: output/Patch_evolution_[branch]_pickle file. It's the output file of 0x2. Thus 0x1, 0x2 should be executed in advance. This file will be imported automatically thus the user doesn't need to set the path manually.
+**required**: 
+1. output/Patch_evolution_[branch]_pickle file. It's the output file of 0x2. Thus 0x1, 0x2 should be executed in advance. This file will be imported automatically thus the user doesn't need to set the path manually.
+
+2. Target source code snapshot.
 
 `~/Patchlocator$ python Patch_matcher_src.py [branch] [targetkernel]`
 
@@ -80,30 +92,37 @@ If the target kernel is a source code snapshot, it tries to match each patched f
 
 ## 0x3.2 Locating patches in a binary image
 
-If the target kernel is a binary image, we need to make use of Fiber, please follow[E-Fiber](https://github.com/zhangzhenghsy/fiber-1/tree/E-Fiber) to install Fiber. To make things easier for users, we prepare a script (Fiberinput.py) to generate inputs of E-Fiber (reference source code/binary image,debug info...) as well as the corresponding E-Fiber commands.
+If the target kernel is a binary image, we need to make use of [E-Fiber](https://github.com/zhangzhenghsy/fiber-1/tree/E-Fiber). To make things easier for users, we prepare a script (Fiberinput.py) to generate inputs for E-Fiber (reference source code/binary image,debug info...) as well as the corresponding E-Fiber commands.
 
-**required**: Patch_evolution_[branch]_pickle file. It's the output file of 0x2. Thus 0x1, 0x2 should be executed in advance. This file will be imported automatically thus the user doesn't need to set the path manually.
+**required**: 
+1. Patch_evolution_[branch]_pickle file. It's the output file of 0x2. Thus 0x1, 0x2 should be executed in advance. This file will be imported automatically thus the user doesn't need to set the path manually.
+
+2. The reference repository where we track the patches. We should have downloaded it in 0x1.
+
+3. GCC tools which are used in compiling kernels. You can get the provided GCC by downloading provided [tools directory](https://drive.google.com/drive/folders/1AeoCTErs2ZuE9e-Ds88zOq57OqmB4RP2?usp=sharing) and copy the directory to ~/Patchlocator/tools. Or you can download GCC from official websites and set the path to GCC directory in environ.sh.
+
+4. Target binary image.
+
+`~/Patchlocator$ source environ.sh`
+
+    This command set environment variables required for compiling.
 
 `~/Patchlocator$ python Fiberinput.py [repo] [branch] [targetkernel]`
 
 - *targetkernel*: path to target binary kernel. targetkernel/boot (binary image) is the binary image.
 
-**Note**: The user needs to set [refsourcepath] [refkernelpath] [config] in Fiberinput.py. 
+**Note**: The user can change the setting of [refsourcepath] [refkernelpath] [config] in Fiberinput.py.
+
 - *refsourcepath*: directory where we want to store reference kernel source code.
 - *refkernelpath*: directory where we want to store reference kernel binary/symbol table/vmlinux/debuginfo.
-- *config*: the config file name when compiling reference kernel. For example, sdm845-perf.
+- *config*: the config file name when compiling reference kernel. For example, sdm845-perf. It must exists in the arch/arm64/configs directory of reference repository.
 
-In Fiberinput.py there are 8 functions, you should execute them in order. [targetkernel] is only used in the last function.
+
+In Fiberinput.py there are 8 functions, they should be executed in order. [targetkernel] is only used in the last function.
 
 - *get_refsources()*: used for getting patch-related source codes of reference kernel.
 - *get_refkernels()*: used for getting binary image/symbol table/vmlinux of reference kernel. We will compile reference kernels here.
-
-**Note**: Before execute get_refkernels(). Please execute the following command in advance.
-
-`~/Patchlocator$ source environ.sh`
-
-This command set environment variables required for compiling. You can use the provided GCC in shared [tools directory](https://drive.google.com/drive/folders/1AeoCTErs2ZuE9e-Ds88zOq57OqmB4RP2?usp=sharing) or download official GCC and hard-code the path in environ.sh.
-- *Get_debuginfo()*: used for extracting debug info from vmlinux. You can use the provided addr2line in tools directory or download GCC by yourself and hard-code the path in environ.sh. 
+- *Get_debuginfo()*: used for extracting debug info from vmlinux. You can use the provided addr2line in tools directory or download GCC by yourself and set the path in get_debuginfo.py.
 - *get_patches()*: used for getting patch file. (for each CVE, each reference kernel, there is a patchfile).
 
 - *generate_pickcommands()*: generate commands used in Fiber pick phase.
