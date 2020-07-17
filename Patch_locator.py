@@ -12,11 +12,13 @@ import ast
 
 def _trim_lines(buf):
     for i in range(len(buf)):
-        if buf[i][-1] == '\n':
-            buf[i] = buf[i][:-1]
+        if len(buf[i]) != 0:
+            if buf[i][-1] == '\n':
+                buf[i] = buf[i][:-1]
 
 #given a CVE, locate the patch in a specific branch of specific repository
 def get_strict_patchcommits((cve,repo,commit),targetrepopath,targetbranch,commitlog):
+    print 'Locating',cve,'in branch',targetbranch,'in repo',targetrepopath
     patchkernel=helper_zz.get_repopath(repo)
     patchinfomation=helper_zz.get_commitinformation(patchkernel,commit)
     Author=patchinfomation['author']
@@ -36,9 +38,9 @@ def get_strict_patchcommits((cve,repo,commit),targetrepopath,targetbranch,commit
 
     #If no results from introduction, we need to use content of patch to locate the patch commit
     helper_zz.checkoutcommit(targetrepopath,targetbranch)
-    if not os.path.exists('patches'):
-        os.mkdir('patches')
-    patchPath="patches/"+cve
+    if not os.path.exists('output/patches'):
+        os.mkdir('output/patches')
+    patchPath="output/patches/"+cve
     if not os.path.exists(patchPath):
         p_buf=helper_zz.get_commit_content(patchkernel,commit)
         with open(patchPath,"w") as f:
@@ -58,7 +60,6 @@ def get_strict_patchcommits((cve,repo,commit),targetrepopath,targetbranch,commit
 
     strictcommits=set()
     fuzzcommits=set()
-    toolongcommits=set()
     #the patch may contain chanegs in multiple files, we try to locate them separately
     for file_name in patchfiles:
         if file_name.endswith("\r"):
@@ -73,10 +74,11 @@ def get_strict_patchcommits((cve,repo,commit),targetrepopath,targetbranch,commit
                 #print file_name,'not exist in this branch log and we find substitution',newfilename
                 changefiles2.add((file_name,newfilename))
             commitcandidates=commitcandidates.union(local_candidates)
-        else:
-            logresult([cve,file_name,'not exist in this branch log and we dont find substitution'])
+        #else:
+        #    logresult([cve,file_name,'not exist in this branch log and we dont find substitution'])
     
     patchfiles=newpatchfiles
+    print 'commitcandidates:',commitcandidates
     if len(commitcandidates)==0:
         return (None,None)
     commitcandidateslist = [(commitcandidate,p_buf,targetrepopath) for commitcandidate in commitcandidates]
@@ -122,7 +124,7 @@ def get_strict_patchcommits((cve,repo,commit),targetrepopath,targetbranch,commit
             if len(inf) >0:
                 logresult([cve,'should be patched in initial commit',initcommit])
                 return ([initcommit],[])
-
+    print list(strictcommits),list(fuzzcommits)
     return (list(strictcommits),list(fuzzcommits))
 
 def get_initcommit(kernel,patchfiles):
@@ -164,39 +166,37 @@ def logresult(infolist):
     with open('output/upstreamresults/'+repo+'/'+branch,'a') as f:
         f.write(line)
 
-#[target repo] [target branch] 
+#[target repo] [target branch] [path to patches file]
+#[patches file]: for example: ./patches
 def patchlocator():
     cve_strictcommit={}
 
-    with open('patchdic','r') as f:
-        CVEinfo=f.readlines()
-    Repo = sys.argv[1]
-    outputdir = 'output/upstreamresults/'+Repo
+    targetrepo = sys.argv[1]
+    outputdir = 'output/upstreamresults/'+targetrepo
     if not os.path.exists(outputdir):
         os.makedirs(outputdir)
-    targetrepo=helper_zz.get_repopath(Repo)
+    targetrepopath=helper_zz.get_repopath(targetrepo)
     targetbranch=sys.argv[2]
-    
-    string1='cd '+targetrepo+';git log --first-parent --oneline '+targetbranch
+    string1='cd '+targetrepopath+';git log --first-parent --oneline '+targetbranch
     mainlog=helper_zz.command(string1)
     mainlogcommits=[line[:12] for line in mainlog]
-    string1='cd '+targetrepo+';git log --oneline '+targetbranch
+    string1='cd '+targetrepopath+';git log --oneline '+targetbranch
     commitlog=helper_zz.command(string1)
-    for line in CVEinfo:
-        if not line.startswith('('):
+    patchesinfo = sys.argv[3]
+    with open(patchesinfo,'r') as f:
+        s_buf=f.readlines()
+    for line in s_buf:
+        if '#' in line:
             continue
-        print line[:-1]
-        line=line[:-1][1:-1]
-        linelist=line.split(", ")
-        (cve,repo,commit)=(linelist[1][1:-1],linelist[2][1:-1],linelist[3][1:-1])
-        if Repo == "android" or Repo == "linux":
+        (cve,repo,commit)=line[:-1].split(' ')
+        if targetrepo == "android" or targetrepo == "linux":
             if "linux" not in repo and "common" not in repo:
                 continue
-        (strictlist,fuzzlist)=get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog)
+        (strictlist,fuzzlist)=get_strict_patchcommits((cve,repo,commit),targetrepopath,targetbranch,commitlog)
         if type(strictlist)==list:
             if len(strictlist) ==1 and len(fuzzlist)==0:
                 cve_strictcommit[cve]=strictlist[0]
-                logresult([cve,strictlist[0],helper_zz.get_commitdate(targetrepo,strictlist[0].split(' ')[-1]),repo])
+                logresult([cve,strictlist[0],helper_zz.get_commitdate(targetrepopath,strictlist[0].split(' ')[-1]),repo])
             else:
                 logresult([cve,strictlist,fuzzlist])
         elif strictlist==None:

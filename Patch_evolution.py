@@ -5,15 +5,13 @@ import pickle
 import copy
 def get_cveinfos():
     cve_info = {}
-    with open('patchdic','r') as f:
+    with open('patches','r') as f:
         s_buf=f.readlines()
     for line in s_buf:
-        if not line.startswith('('):
+        if line.startswith("#"):
             continue
-        line=line[:-1][1:-1]
-        linelist=line.split(", ")
-        (month,cve,repo,commit)=(linelist[0][1:-1],linelist[1][1:-1],linelist[2][1:-1],linelist[3][1:-1])
-        cve_info[cve]=(month,cve,repo,commit)
+        (cve,repo,commit)=line[-1].split(" ")
+        cve_info[cve]=(cve,repo,commit)
     return cve_info
 
 def get_mainfilecommits(repopath,branch,filename):
@@ -55,7 +53,7 @@ def Patchevolution_tracker():
         print "\n"+cve,commit,maincommit
         beforecommit=helper_zz.get_previouscommit(repopath,maincommit)
         cve_beforecommit[cve]=beforecommit
-        (month,cve,original_repo,original_commit)=cve_info[cve]
+        (cve,original_repo,original_commit)=cve_info[cve]
         original_repopath = helper_zz.get_repopath(original_repo)
         print original_repo,original_commit
         functiondic=helper_zz.get_commit_functions2(original_repopath,original_commit)
