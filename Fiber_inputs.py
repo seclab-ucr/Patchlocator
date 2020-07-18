@@ -13,6 +13,8 @@ refsourcepath = os.getcwd()+'/Fiberinputs/refsources'
 refkernelpath = os.getcwd()+'/Fiberinputs/refkernels'
 #the config file name when compiling reference kernel
 config='sdm845-perf'
+
+# used for getting patch-related source codes of reference kernel.
 def get_refsources(repo,branch):
     repopath = helper_zz.get_repopath(repo)
     global refsourcepath
@@ -37,7 +39,7 @@ def get_refsources(repo,branch):
                 string1= 'cd '+repopath+';git show '+afterpatchcommit+':'+filename+' > '+filepath
                 helper_zz.command(string1)
 
-#get binary/symbol table/vmlinux of refkernel
+#used for getting binary image/symbol table/vmlinux of reference kernel. We will compile reference kernels here
 def get_refkernels(repo,branch):
     global refkernelpath,config
     if not os.path.exists(refkernelpath):
@@ -53,7 +55,7 @@ def get_refkernels(repo,branch):
     commitlist = list(set(commitlist))
     compile_kernels.compile_kernel(repo,commitlist,config,refkernelpath)
 
-#it will cost much time
+#used for extracting debug info from vmlinux. You can use the provided addr2line in tools directory or download GCC by yourself and set the path in get_debuginfo.py. It will cost much time
 def Get_debuginfo():
     global refkernelpath
     get_debuginfo.get_debuginfo(refkernelpath)
@@ -86,7 +88,7 @@ def generatepatchfile(repo,nopatchcommit,patchcommit,elementset):
         totalpatchfile += p_buf2
     return totalpatchfile
 
-#we put the patches in the same dir as refsources
+#used for getting patch file. (for each CVE, each reference kernel, there is a patchfile).
 def get_patches(repo,branch):
     print 'get_patches:'
     pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
@@ -221,4 +223,5 @@ if __name__ == '__main__':
     generate_pickcommands(branch)
     generate_extcommands(branch)
     generate_matchcommands_ref(branch)
-    generate_matchcommands_target(branch,sys.argv[3])
+    for targetkernel in sys.argv[3:]:
+        generate_matchcommands_target(branch,targetkernel)

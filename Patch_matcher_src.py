@@ -129,5 +129,6 @@ def comparewithgroundtruth():
 #[branch] [target kernel]
 if __name__ == '__main__':
     branch =  sys.argv[1]
-    targetkernel = sys.argv[2]
-    compare_sourcecode(branch,targetkernel)
+    targetkernel_list = sys.argv[2:]
+    for targetkernel in targetkernel_list: 
+        compare_sourcecode(branch,targetkernel)
