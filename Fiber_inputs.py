@@ -1,7 +1,7 @@
 #this file is used for generating inputs of fiber
 #input the "Patch_evolution_"+branch+"_pickle" from patchevolution.py
 import helper_zz
-import compilekernels
+import compile_kernels
 import get_debuginfo
 import os,sys
 import pickle
@@ -51,7 +51,7 @@ def get_refkernels(repo,branch):
         for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
             commitlist += [afterpatchcommit]
     commitlist = list(set(commitlist))
-    compilekernels.compile_kernel(repo,commitlist,config,refkernelpath)
+    compile_kernels.compile_kernel(repo,commitlist,config,refkernelpath)
 
 #it will cost much time
 def Get_debuginfo():

@@ -137,7 +137,29 @@ Finally, you can execute the commands in E-Fiber directory, the commands can be 
 
 **Note**: Since we match target kernel with signatures generated from multiple reference kernels, for each patch there are multiple results in targetkernel/matchresults. If any of them is 'P', then we think it's adopted in targetkernel.
 
-## 0x4 Notes for other files
+## 0x4 Overall patchlocator
+
+To make things easier for users, we prepare a script that combining all steps above.
+
+**required**:
+1. Patches info file.
+
+2. The patch-related repositories in Patches info file.
+
+3. The repository where we want to locate/keep track of patches.
+
+4. The target source code/binary snapshots.
+
+5. Downloading provided [tools directory](https://drive.google.com/drive/folders/1AeoCTErs2ZuE9e-Ds88zOq57OqmB4RP2?usp=sharing) and copy the directory to ~/Patchlocator/tools
+
+All of them have been introduced above.
+
+`~/Patchlocator$ source environ.sh`
+`~/Patchlocator$ python Overall_patch_locator.py [mode] [repo] [branch] [patches info file] [target kernel]`
+
+- *mode*: 'repo','source','binary'. Each corresponds a target type
+
+## 0x5 Notes for other files
 
 **helper_zz.py**: stores some helper functions related to git repository.
 
@@ -145,7 +167,7 @@ Finally, you can execute the commands in E-Fiber directory, the commands can be 
 
 **sym_table.py**: stores some helper functions related to symbol table.
 
-**compilekernels.py**: stores some helper functions related to kernel compilation.
+**compile_kernels.py**: stores some helper functions related to kernel compilation.
 
 **ext_sym**: used for generating symbol tables. We get it from Fiber.
 
