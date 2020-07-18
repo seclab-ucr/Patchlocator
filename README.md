@@ -4,11 +4,11 @@ Open source patch presence test system. Given a patch commit in upstream reposit
 
 There are three kinds of kernels:
 
-1. Reposiroty. Patchlocator can make use of information of the patches (introductin message, commit date, changed lines, etc) to locate the corresponding commit in target repository. If the target kernel is a repository, please read section 0x0 and 0x1.
+1. Repository. Patchlocator can make use of information of the patches (introduction message, commit date, changed lines, etc) to locate the corresponding commit in target repository. If the target kernel is a repository, please read section 0x0 and 0x1.
 
 2. Source code snapshots. Patchlocator can determine if a patch is applied in a source code snapshot. If the target kernel is a source code snapshot, please read section 0x0 and 0x1, 0x2 and 0x3.1. 
 
-3. Binary image snapshots. Patchlocator can determine if a patch is applied in a binary image with the helper of [E-Fiber](https://github.com/zhangzhenghsy/fiber-1/tree/E-Fiber). If the target kernel is a source code snapshot, please read section 0x0 and 0x1, 0x2 and 0x3.2.
+3. Binary image snapshots. Patchlocator can determine if a patch is applied in a binary image with the helper of [E-Fiber](https://github.com/zhangzhenghsy/fiber-1/tree/E-Fiber). If the target kernel is a binary snapshot, please read section 0x0 and 0x1, 0x2 and 0x3.2.
 
 The key insight is that 1) The functions in downstream are usually similar with those in corresponding upstream kernels, thus we can extract information of patched functions in upstream kernels to determine if the function is patched in downstream kernels. 2)(For source/binary snapshot targets) After a patch is applied in upstream kernel, the patched function may evolve with time. The patched function in target kernel may be similar to any version of patched function in upstream.  To achieve higher accuracy we keep track of the patched functions in upstream kernel and extract information from multiple versions of patched functions. 
 
@@ -157,7 +157,7 @@ All of them have been introduced above.
 `~/Patchlocator$ source environ.sh`
 `~/Patchlocator$ python Overall_patch_locator.py [mode] [repo] [branch] [patches info file] [target kernel]`
 
-- *mode*: 'repo','source','binary'. Each corresponds a target type
+- *mode*: 'repo', 'source', 'binary'. Each corresponds a target type
 
 ## 0x5 Notes for other files
 
