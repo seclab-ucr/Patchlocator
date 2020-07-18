@@ -65,7 +65,7 @@ Here are some examples of lines in output file:
 
 **output**:
 
-output/Patch_evolution_[branch]_pickle. It's a file containing results of patch evolutions. (eg, examples/output/Patch_evolution_kernel.lnx.4.9.r25-rel_pickle)
+output/Patch_evolution_[branch]_pickle. It's a file containing results of patch evolutions. (eg. examples/output/Patch_evolution_kernel.lnx.4.9.r25-rel_pickle)
 
 
 ## 0x3.1 Locating patches in a source code snapshot
@@ -83,7 +83,7 @@ If the target kernel is a source code snapshot, we try to match each version of 
 
 **output**: 
 
-[targetkernel]/matchresults where P means the related patch has been adopted, N means the related patch has not been adopted and None means the patch-related function is not found in targetkernel. (eg, examples/target_kernel_source/matchresults)
+[targetkernel]/matchresults where P means the related patch has been adopted, N means the related patch has not been adopted and None means the patch-related function is not found in targetkernel. (eg. examples/target_kernel_source/matchresults)
 
 ## 0x3.2 Locating patches in a binary image
 
