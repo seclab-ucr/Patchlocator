@@ -137,9 +137,9 @@ Finally, you can execute the commands in E-Fiber directory, the commands can be 
 
 **Note**: Since we match target kernel with signatures generated from multiple reference kernels, for each patch there are multiple results in targetkernel/matchresults. If any of them is 'P', then we think it's adopted in targetkernel.
 
-## 0x4 Overall patchlocator
+## 0x4 Overall patch locator
 
-To make things easier for users, we prepare a script that combining all steps above.
+To make things easier for users, we prepare a script that combines all steps above.
 
 **required**:
 1. Patches info file.
