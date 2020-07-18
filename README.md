@@ -87,7 +87,7 @@ If the target kernel is a source code snapshot, we try to match each version of 
 
 ## 0x3.2 Locating patches in a binary image
 
-If the target kernel is a binary image, we need to make use of [E-Fiber](https://github.com/zhangzhenghsy/fiber-1/tree/E-Fiber). To make things easier for users, we prepare a script (Fiberinput.py) to generate inputs for E-Fiber (reference source code/binary image,debug info...) as well as the corresponding E-Fiber commands.
+If the target kernel is a binary image, we need to make use of [E-Fiber](https://github.com/zhangzhenghsy/fiber-1/tree/E-Fiber). To make things easier for users, we prepare a script (Fiber_input.py) to generate inputs for E-Fiber (reference source code/binary image,debug info...) as well as the corresponding E-Fiber commands.
 
 **required**: 
 1. Patch_evolution_[branch]_pickle file. It's the output file of 0x2. Thus 0x1, 0x2 should be executed in advance. This file will be imported automatically thus the user doesn't need to set the path manually.
@@ -100,18 +100,18 @@ If the target kernel is a binary image, we need to make use of [E-Fiber](https:/
 
 `~/Patchlocator$ source environ.sh`
 
-`~/Patchlocator$ python Fiberinput.py [repo] [branch] [targetkernel]`
+`~/Patchlocator$ python Fiber_input.py [repo] [branch] [targetkernel]`
 
 - *targetkernel*: path to target binary kernel. targetkernel/boot (binary image) is the binary image.
 
-**Note**: The user can change the setting of [refsourcepath] [refkernelpath] [config] in Fiberinput.py.
+**Note**: The user can change the setting of [refsourcepath] [refkernelpath] [config] in Fiber_input.py.
 
 - *refsourcepath*: directory where we want to store reference kernel source code.
 - *refkernelpath*: directory where we want to store reference kernel binary/symbol table/vmlinux/debuginfo.
-- *config*: the config file name when compiling reference kernel. For example, sdm845-perf. It must exists in the arch/arm64/configs directory of reference repository.
+- *config*: the name of config file used in compiling reference kernels. For example, sdm845-perf. It must exists in the arch/arm64/configs directory of reference repository.
 
 
-In Fiberinput.py there are 8 functions, they should be executed in order. [targetkernel] is only used in the last function.
+In Fiber_input.py there are 8 functions, they should be executed in order. [targetkernel] is only used in the last function.
 
 - *get_refsources()*: used for getting patch-related source codes of reference kernel.
 - *get_refkernels()*: used for getting binary image/symbol table/vmlinux of reference kernel. We will compile reference kernels here.
@@ -155,6 +155,7 @@ To make things easier for users, we prepare a script that combines all steps abo
 All of them have been introduced above.
 
 `~/Patchlocator$ source environ.sh`
+
 `~/Patchlocator$ python Overall_patch_locator.py [mode] [repo] [branch] [patches info file] [target kernel]`
 
 - *mode*: 'repo', 'source', 'binary'. Each corresponds a target type
