@@ -102,7 +102,7 @@ If the target kernel is a binary image, we need to make use of [E-Fiber](https:/
 
 `~/Patchlocator$ python Fiber_input.py [repo] [branch] [targetkernel1] [targetkernel2] ...`
 
-- *targetkernel*: path to target binary kernel. targetkernel/boot (binary image) is the binary image. We can have multiple target kernels here.
+- *targetkernel*: path to target binary kernel. targetkernel/boot (binary image) is the binary image. We can have multiple target kernels here. (eg. examples/target_kernel_binary/)
 
 **Note**: The user can change the setting of [refsourcepath] [refkernelpath] [config] in Fiber_input.py.
 
@@ -151,7 +151,7 @@ All of them have been introduced above.
 
 `~/Patchlocator$ python Overall_patch_locator.py [mode] [repo] [branch] [patches info file] [target kernel1] [target kernel2] ...`
 
-- *mode*: 'repo', 'source', 'binary'. Each corresponds a target type
+- *mode*: it can be 'repo', 'source' or 'binary'. Each corresponds a type of target kernel.
 
 ## 0x5 Notes for other files
 
