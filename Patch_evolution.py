@@ -3,9 +3,9 @@ import src_parser
 import sys
 import pickle
 import copy
-def get_cveinfos():
+def get_cveinfos(patches_info):
     cve_info = {}
-    with open(sys.argv[3],'r') as f:
+    with open(patches_info,'r') as f:
         s_buf=f.readlines()
     for line in s_buf:
         if line.startswith("#"):
@@ -34,12 +34,10 @@ def get_afterpatchcommits(repopath,branch,filename,patchcommit):
 
 #input: [repo] [branch] [patches info file] 
 #output: dictionary cve-filename-funcname-funccontent
-def Patchevolution_tracker():
-    repo=sys.argv[1]
+def Patchevolution_tracker(repo,branch,patches_info):
     repopath = helper_zz.get_repopath(repo)
-    branch = sys.argv[2]
 
-    cve_info=get_cveinfos()
+    cve_info=get_cveinfos(patches_info)
     cve_functioncontent = {}
     cve_commit_element_content = {}
     patchlocator_result = "output/upstreamresults/"+repo+"/"+branch
@@ -100,4 +98,7 @@ def Patchevolution_tracker():
 
 
 if __name__ == '__main__':
-    Patchevolution_tracker()
+    repo=sys.argv[1]
+    branch=sys.argv[2]
+    patches_info=sys.argv[3]
+    Patchevolution_tracker(repo,branch,patches_info)

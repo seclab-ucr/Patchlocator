@@ -913,16 +913,3 @@ def get_commitnumber_4_fuzz(head,clines,blines,alines,s_buf):
         else:
             i +=1
     return None
-
-def get_cveinfos():
-    cve_info = {}
-    with open('patchdic','r') as f:
-        s_buf=f.readlines()
-    for line in s_buf:
-        if not line.startswith('('):
-            continue
-        line=line[:-1][1:-1]
-        linelist=line.split(", ")
-        (month,cve,repo,commit)=(linelist[0][1:-1],linelist[1][1:-1],linelist[2][1:-1],linelist[3][1:-1])
-        cve_info[cve]=(month,cve,repo,commit)
-    return cve_info

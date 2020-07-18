@@ -3,6 +3,7 @@ import helper_zz
 import pickle
 
 def compare_sourcecode(branch,targetpath):
+    print '\nLocate_patches in sourcecodesnapshot',targetpath,' with reference branch',branch
     filepath='./output/Patch_evolution_'+branch+'_pickle'
     pickle_in=open(filepath,'rb')
     cve_commit_element_content=pickle.load(pickle_in)
@@ -13,7 +14,9 @@ def compare_sourcecode(branch,targetpath):
     countTrue=0
     countFalse=0
     countNone=0
+    Truelist=[]
     Falselist=[]
+    Nonelist=[]
     for cve in cve_commit_element_content:
         result='None'
         for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
@@ -30,17 +33,23 @@ def compare_sourcecode(branch,targetpath):
         cve_result[cve]=result
         if result== 'P':
             countTrue +=1
+            Truelist += [cve]
         elif result=='N':
             countFalse +=1
             Falselist += [cve]
         elif result=='None':
             countNone +=1
+            Nonelist += [cve]
     with open(outputfile,'w') as f:
         for cve in cvelist:
             if cve in cve_result:
                 f.write(cve+' '+str(cve_result[cve])+'\n')
-    print 'countTrue:',countTrue,'countFalse:',countFalse,'countNone:',countNone
-    print 'Falselist:',Falselist
+    print 'patched vulnerability list ',len(Truelist)
+    print Truelist
+    print 'not patched vulnerability list',len(Falselist)
+    print Falselist
+    print 'none vulnerability list:',len(Nonelist)
+    print Nonelist
 
 def comparewithgroundtruth():
     resultpath=sys.argv[1]
@@ -119,4 +128,6 @@ def comparewithgroundtruth():
 
 #[branch] [target kernel]
 if __name__ == '__main__':
-    compare_sourcecode(sys.argv[1],sys.argv[2])
+    branch =  sys.argv[1]
+    targetkernel = sys.argv[2]
+    compare_sourcecode(branch,targetkernel)

@@ -17,9 +17,10 @@ def _trim_lines(buf):
                 buf[i] = buf[i][:-1]
 
 #given a CVE, locate the patch in a specific branch of specific repository
-def get_strict_patchcommits((cve,repo,commit),targetrepopath,targetbranch,commitlog):
-    print 'Locating',cve,'in branch',targetbranch,'in repo',targetrepopath
+def get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog):
     patchkernel=helper_zz.get_repopath(repo)
+    targetrepopath=helper_zz.get_repopath(targetrepo)
+    print 'Locating',cve,'in branch',targetbranch,'in repo',targetrepopath
     patchinfomation=helper_zz.get_commitinformation(patchkernel,commit)
     Author=patchinfomation['author']
     authortime=patchinfomation['authortime']
@@ -155,8 +156,8 @@ def determinebyintro(simpleintroduction,infomation):
     return False
 
 def logresult(infolist):
-    repo = sys.argv[1]
-    branch = sys.argv[2]
+    repo = Targetrepo
+    branch = Targetbranch
     line = ''
     for info in infolist:
         line += str(info)+' '
@@ -166,21 +167,22 @@ def logresult(infolist):
 
 #[target repo] [target branch] [path to patches file]
 #[patches file]: for example: ./patches
-def patchlocator():
+def patchlocator(targetrepo,targetbranch,patchesinfo):
+    #used in logresult
+    global Targetrepo,Targetbranch
+    Targetrepo = targetrepo
+    Targetbranch = targetbranch
     cve_strictcommit={}
 
-    targetrepo = sys.argv[1]
     outputdir = 'output/upstreamresults/'+targetrepo
     if not os.path.exists(outputdir):
         os.makedirs(outputdir)
     targetrepopath=helper_zz.get_repopath(targetrepo)
-    targetbranch=sys.argv[2]
     string1='cd '+targetrepopath+';git log --first-parent --oneline '+targetbranch
     mainlog=helper_zz.command(string1)
     mainlogcommits=[line[:12] for line in mainlog]
     string1='cd '+targetrepopath+';git log --oneline '+targetbranch
     commitlog=helper_zz.command(string1)
-    patchesinfo = sys.argv[3]
     with open(patchesinfo,'r') as f:
         s_buf=f.readlines()
     for line in s_buf:
@@ -190,7 +192,7 @@ def patchlocator():
         if targetrepo == "android" or targetrepo == "linux":
             if "linux" not in repo and "common" not in repo:
                 continue
-        (strictlist,fuzzlist)=get_strict_patchcommits((cve,repo,commit),targetrepopath,targetbranch,commitlog)
+        (strictlist,fuzzlist)=get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog)
         if type(strictlist)==list:
             if len(strictlist) ==1 and len(fuzzlist)==0:
                 cve_strictcommit[cve]=strictlist[0]
@@ -202,4 +204,7 @@ def patchlocator():
             logresult([cve,'None'])
 
 if __name__ == '__main__':
-    patchlocator()
+    targetrepo=sys.argv[1]
+    targetbranch=sys.argv[2]
+    patchesinfo=sys.argv[3]
+    patchlocator(targetrepo,targetbranch,patchesinfo)
