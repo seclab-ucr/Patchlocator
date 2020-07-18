@@ -35,7 +35,7 @@ Pygments modules required. `sudo pip install Pygments` to install it.
 - *patches info file*: Path to required patches info file mentioned above.
 
 **output**:
-~/Patchlocator/output/upstreamresults/repo/branch. It's a file that stores the results of patch locating for target branch. For example, output/upstreamresults/msm-4.9/kernel.lnx.4.9.r25-rel.
+~/Patchlocator/output/upstreamresults/repo/branch. It's a file that stores the results of patch locating for target branch. For example, examples/output/upstreamresults/msm-4.9/kernel.lnx.4.9.r25-rel.
 
 Here are some examples of lines in output file:
 
@@ -65,7 +65,7 @@ Here are some examples of lines in output file:
 
 **output**:
 
-output/Patch_evolution_[branch]_pickle. It's a file containing results of patch evolutions. (eg, output/Patch_evolution_kernel.lnx.4.9.r25-rel_pickle)
+output/Patch_evolution_[branch]_pickle. It's a file containing results of patch evolutions. (eg, examples/output/Patch_evolution_kernel.lnx.4.9.r25-rel_pickle)
 
 
 ## 0x3.1 Locating patches in a source code snapshot
@@ -77,13 +77,13 @@ If the target kernel is a source code snapshot, we try to match each version of 
 
 2. Target source code snapshot.
 
-`~/Patchlocator$ python Patch_matcher_src.py [branch] [targetkernel]`
+`~/Patchlocator$ python Patch_matcher_src.py [branch] [targetkernel1] [targetkernel2] ...`
 
-- *targetkernel*: path to target source code kernel
+- *targetkernel*: path to target source code kernel. We can have multiple target kernels here. (match them one by one)
 
 **output**: 
 
-[targetkernel]/matchresults where P means the related patch has been adopted, N means the related patch has not been adopted and None means the patch-related function is not found in targetkernel.
+[targetkernel]/matchresults where P means the related patch has been adopted, N means the related patch has not been adopted and None means the patch-related function is not found in targetkernel. (eg, examples/target_kernel_source/matchresults)
 
 ## 0x3.2 Locating patches in a binary image
 
@@ -100,9 +100,9 @@ If the target kernel is a binary image, we need to make use of [E-Fiber](https:/
 
 `~/Patchlocator$ source environ.sh`
 
-`~/Patchlocator$ python Fiber_input.py [repo] [branch] [targetkernel]`
+`~/Patchlocator$ python Fiber_input.py [repo] [branch] [targetkernel1] [targetkernel2] ...`
 
-- *targetkernel*: path to target binary kernel. targetkernel/boot (binary image) is the binary image.
+- *targetkernel*: path to target binary kernel. targetkernel/boot (binary image) is the binary image. We can have multiple target kernels here.
 
 **Note**: The user can change the setting of [refsourcepath] [refkernelpath] [config] in Fiber_input.py.
 
@@ -111,27 +111,20 @@ If the target kernel is a binary image, we need to make use of [E-Fiber](https:/
 - *config*: the name of config file used in compiling reference kernels. For example, sdm845-perf. It must exists in the arch/arm64/configs directory of reference repository.
 
 
-In Fiber_input.py there are 8 functions, they should be executed in order. [targetkernel] is only used in the last function.
+**output**: 
 
-- *get_refsources()*: used for getting patch-related source codes of reference kernel.
-- *get_refkernels()*: used for getting binary image/symbol table/vmlinux of reference kernel. We will compile reference kernels here.
-- *Get_debuginfo()*: used for extracting debug info from vmlinux. You can use the provided addr2line in tools directory or download GCC by yourself and set the path in get_debuginfo.py.
-- *get_patches()*: used for getting patch file. (for each CVE, each reference kernel, there is a patchfile).
+Fiberinputs/refsources: patch-related source codes of reference kernels. (eg. examples/Fiberinputs/refsources)
 
-- *generate_pickcommands()*: generate commands used in Fiber pick phase.
+Fiberinputs/refkernels: binary image/symbol table/vmlinux of reference kernels. (eg. examples/Fiberinputs/refkernels. Due to the oversize of vmlinux/debug info file, we don't include them in example directory)
 
-    **output**: Fiberinputs/pickcommands
-- *generate_extcommands()*: generate commands used in Fiber extract phase.
+Fiberinputs/pickcommands: commands used in Fiber pick phase. (eg. examples/Fiberinputs/pickcommands)
 
-    **output**: Fiberinputs/extcommands
-- *generate_matchcommands_ref()*: generate match commands for reference kernels(mode 0 , 2 in Fiber).
+Fiberinputs/extcommands: commands used in Fiber extract phase. (eg. examples/Fiberinputs/extcommands)
 
-    **output**: Fiberinputs/matchcommands_ref
-- *generate_matchcommands_target()*: generate match commands for target kernels(mode 0 , 2 in Fiber).
+Fiberinputs/matchcommands_ref. Commands in Fiber match phase (with reference kernel). (eg. examples/Fiberinputs/matchcommands_ref)
 
-    **output**: Fiberinputs/matchcommands_targetkernel
+Fiberinputs/matchcommands_target. Commands in Fiber match phase (with target kernel). (eg. examples/Fiberinputs/matchcommands_target)
 
-**Note**: when you have multiple target kernels with the same reference branch, you only need to execute generate_pickcommands()/generate_extcommands()/generate_matchcommands_ref once while executing generate_matchcommands_target() for each target.
 
 Finally, you can execute the commands in E-Fiber directory, the commands can be executed in parallel to speed up the process. (For example, with the help of GNU Parallel).
 
@@ -156,7 +149,7 @@ All of them have been introduced above.
 
 `~/Patchlocator$ source environ.sh`
 
-`~/Patchlocator$ python Overall_patch_locator.py [mode] [repo] [branch] [patches info file] [target kernel]`
+`~/Patchlocator$ python Overall_patch_locator.py [mode] [repo] [branch] [patches info file] [target kernel1] [target kernel2] ...`
 
 - *mode*: 'repo', 'source', 'binary'. Each corresponds a target type
 
