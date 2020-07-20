@@ -23,7 +23,7 @@ def compile_kernel(repo,commitlist,config,refkernelpath):
                 print 'compile success for',commit,configfile
                 oldpath=kernel+'/output'
                 #newpath='/data/zheng/msm-4.9/'+commit+'_'+configfile[:-10]
-                os.mkdir(newpath)
+                os.makedirs(newpath)
                 copyfile(oldpath+'/arch/arm64/boot/Image',newpath+'/boot')
                 copyfile(oldpath+'/System.map',newpath+'/System.map')
                 copyfile(oldpath+'/vmlinux',newpath+'/vmlinux')
