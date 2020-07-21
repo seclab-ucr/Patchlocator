@@ -6,7 +6,7 @@ import time
 from multiprocessing import Pool
 import helper_zz
 
-ADDR2LINE = 'tools/aarch64-linux-android-4.9/bin/aarch64-linux-android-addr2line'
+ADDR2LINE = 'aarch64-linux-android-4.9/bin/aarch64-linux-android-addr2line'
 
 def get_debuginfo(kernelspath):
     dirs = os.listdir(kernelspath)
