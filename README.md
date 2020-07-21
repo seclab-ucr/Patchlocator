@@ -67,7 +67,7 @@ Here are some examples of lines in output file:
 
 4) CVE-2019-2328 [] ['dce0f8189f75',...]
 
-    We do not find the commit that can be strictly matched with the original patch commit. But we get several commits that may be related to the patch. The users can check them manually or ignore this patch for the moment.
+    We do not find any commit that can be strictly matched with the original patch commit. But we get several commits that may be related to the patch. The users can check them manually or ignore this patch for the moment.
 
 ## 0x2 Locating patches in a source code snapshot
 

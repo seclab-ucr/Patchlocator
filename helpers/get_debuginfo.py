@@ -6,9 +6,10 @@ import time
 from multiprocessing import Pool
 import helper_zz
 
-ADDR2LINE = 'aarch64-linux-android-4.9/bin/aarch64-linux-android-addr2line'
+ADDR2LINE = os.getcwd()+'/helpers/aarch64-linux-android-4.9/bin/aarch64-linux-android-addr2line'
 
 def get_debuginfo(kernelspath):
+    print ADDR2LINE
     dirs = os.listdir(kernelspath)
     PATHLIST=[]
     #clear
@@ -18,7 +19,6 @@ def get_debuginfo(kernelspath):
         if not os.path.exists(PATH+"/vmlinux"):
             continue
         if not os.path.exists(PATH+"/tmp_o"):
-            #print PATH
             PATHLIST += [PATH]
     p=Pool(20)
     resultlist=p.map(get_debuginfo_1,PATHLIST)
