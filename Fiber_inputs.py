@@ -107,8 +107,8 @@ def get_patches(repo,branch):
                     f.write(line)
 
 #generate commands used in Fiber pick phase
-def generate_pickcommands(branch):
-    global refsourcepath,refsourcepath,config
+def generate_pickcommands(branch,config):
+    global refsourcepath,refsourcepath
     pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
     cve_commit_element_content = pickle.load(pickle_in)
     pickcommands = []
@@ -128,8 +128,8 @@ def generate_pickcommands(branch):
             f.write(line+'\n')
 
 #generate commands used in Fiber extract phase
-def generate_extcommands(branch):
-    global refsourcepath,refsourcepath,config
+def generate_extcommands(branch,config):
+    global refsourcepath,refsourcepath
     pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
     cve_commit_element_content = pickle.load(pickle_in)
     extcommands = []
@@ -145,8 +145,8 @@ def generate_extcommands(branch):
             f.write(line+'\n')
 
 #generate match commands for reference kernels(mode 0 , 2 in Fiber), only need to be executed once (when there are multiple targets)
-def generate_matchcommands_ref(branch):
-    global refsourcepath,refsourcepath,config
+def generate_matchcommands_ref(branch,config):
+    global refsourcepath,refsourcepath
     pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
     cve_commit_element_content = pickle.load(pickle_in)
     matchcommands1 = []
@@ -184,7 +184,7 @@ def generate_matchcommands_ref(branch):
         for line in matchcommands:
             f.write(line+'\n')
 
-def generate_matchcommands_target(branch,targetkernelpath):
+def generate_matchcommands_target(branch,targetkernelpath,config):
     if not os.path.exists(targetkernelpath+'/boot'):
         print 'no binary image in',targetkernelpath
         return
@@ -193,7 +193,7 @@ def generate_matchcommands_target(branch,targetkernelpath):
         string1='./helpers/ext_sym '+targetkernelpath+'/boot > '+targetkernelpath+'/System.map'
         result=helper_zz.command(string1)
 
-    global refsourcepath,refsourcepath,config
+    global refsourcepath,refsourcepath
     pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
     cve_commit_element_content = pickle.load(pickle_in)
 
@@ -219,8 +219,8 @@ if __name__ == '__main__':
     Get_debuginfo()
     get_patches(repo,branch)
     
-    generate_pickcommands(branch)
-    generate_extcommands(branch)
-    generate_matchcommands_ref(branch)
+    generate_pickcommands(branch,config)
+    generate_extcommands(branch,config)
+    generate_matchcommands_ref(branch,config)
     for targetkernel in sys.argv[4:]:
         generate_matchcommands_target(branch,targetkernel)

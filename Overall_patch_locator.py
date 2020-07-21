@@ -17,19 +17,20 @@ def Locate_patch_sourcecodesnapshot(repo,branch,patchesinfo,targetkernel_list):
         Patch_matcher_src.compare_sourcecode(branch,targetkernel)
 
 def Locate_patch_binarysnapshot(repo,branch,patchesinfo,config,targetkernel_list):
-    Patch_locator.patchlocator(repo,branch,patchesinfo)
-    Patch_evolution.Patchevolution_tracker(repo,branch,patchesinfo)
-    Fiber_inputs.get_refsources(repo,branch)
+    print 'repo:',repo,'branch:',branch,'patchesinfo:',patchesinfo,'config:',config
+    #Patch_locator.patchlocator(repo,branch,patchesinfo)
+    #Patch_evolution.Patchevolution_tracker(repo,branch,patchesinfo)
+    #Fiber_inputs.get_refsources(repo,branch)
     Fiber_inputs.get_refkernels(repo,branch,config)
 
     Fiber_inputs.Get_debuginfo()
     Fiber_inputs.get_patches(repo,branch)
 
-    Fiber_inputs.generate_pickcommands(branch)
-    Fiber_inputs.generate_extcommands(branch)
-    Fiber_inputs.generate_matchcommands_ref(branch)
+    Fiber_inputs.generate_pickcommands(branch,config)
+    Fiber_inputs.generate_extcommands(branch,config)
+    Fiber_inputs.generate_matchcommands_ref(branch,config)
     for targetkernel in targetkernel_list:
-        Fiber_inputs.generate_matchcommands_target(branch,targetkernel)
+        Fiber_inputs.generate_matchcommands_target(branch,targetkernel,config)
 
 def Locate_patch():
     mode = sys.argv[1]
