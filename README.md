@@ -39,6 +39,7 @@ With the commit number, we can extract useful information (e.g., introduction me
 **Note**: Please set the repo paths in ./helpers/helper_zz.py get_repopath() function. With this function we can get the path to the repository directory.  The repo names in get_repopath() should be consistent with those in patches info file.
 
 **usage**:
+
 `~/Patchlocator$ python Overall_patch_locator.py repo [targetrepo] [targetbranch] [patches info file]`
 
 - *targetrepo*: Target repo name. For example, [msm-4.9](https://source.codeaurora.org/quic/la/kernel/msm-4.9/).
@@ -85,6 +86,7 @@ For example, we want to determine if a CVE is patched in a source code snapshot 
 3. [target kernel]: Target source code kernel.
 
 **usage**:
+
 `~/Patchlocator$ python Overall_patch_locator.py source [reference repo] [reference branch] [patches info file] [target kernel1] [target kernel2] ...`
 
 - *reference repo*: The name of reference repository.
@@ -114,6 +116,7 @@ Like source code snapshot, when the target kernel is a binary image snapshot, we
 4. Download GCC tools which are used in cross-compiling kernels and set up the environmental variables. Execute the following command to get them.
 
 **usage**:
+
 `~/Patchlocator$ cd helpers;git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9;source environ.sh`
 
 `~/Patchlocator$ python Overall_patch_locator.py binary [reference repo] [reference branch] [patches info file] [config] [target kernel1] [target kernel2] ...`
