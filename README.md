@@ -135,7 +135,7 @@ Finally, you can execute the commands in E-Fiber directory, the commands can be 
 **Note**: Since we match target kernel with signatures generated from multiple reference kernels, for each patch there are multiple results in targetkernel/matchresults. If any of them is 'P', then we think it's adopted in targetkernel.
 
 
-## 0x5 Notes for other files
+## 0x4 Notes for other files
 
 **Patch_locator.py**: stores helper function that locates a patch in given branch.
 
