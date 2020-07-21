@@ -18,9 +18,9 @@ def Locate_patch_sourcecodesnapshot(repo,branch,patchesinfo,targetkernel_list):
 
 def Locate_patch_binarysnapshot(repo,branch,patchesinfo,config,targetkernel_list):
     print 'repo:',repo,'branch:',branch,'patchesinfo:',patchesinfo,'config:',config
-    #Patch_locator.patchlocator(repo,branch,patchesinfo)
-    #Patch_evolution.Patchevolution_tracker(repo,branch,patchesinfo)
-    #Fiber_inputs.get_refsources(repo,branch)
+    Patch_locator.patchlocator(repo,branch,patchesinfo)
+    Patch_evolution.Patchevolution_tracker(repo,branch,patchesinfo)
+    Fiber_inputs.get_refsources(repo,branch)
     Fiber_inputs.get_refkernels(repo,branch,config)
 
     Fiber_inputs.Get_debuginfo()
