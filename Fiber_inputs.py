@@ -8,9 +8,9 @@ import pickle
 from shutil import copyfile
 
 #directory that stores reference kernel source code
-refsourcepath = os.getcwd()+'/Fiberinputs/refsources'
+refsourcepath = os.getcwd()+'/output/Fiberinputs/refsources'
 #directory that stores reference kernel binary/symbol table/vmlinux/debuginfo
-refkernelpath = os.getcwd()+'/Fiberinputs/refkernels'
+refkernelpath = os.getcwd()+'/output/Fiberinputs/refkernels'
 
 # used for getting patch-related source codes of reference kernel.
 def get_refsources(repo,branch):

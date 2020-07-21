@@ -14,7 +14,7 @@ The key insights are:
 
 1. The functions in downstream are usually similar with those in corresponding upstream kernels, thus we can extract information of patched functions in upstream kernels to determine if the function is patched in downstream kernels. 
 
-2. (For source/binary snapshot targets) After a patch is applied in upstream kernel, the patched function may evolve with time. The patched function in target kernel may be similar to any version of patched function in upstream.  To achieve higher accuracy, we keep track of the patched functions in upstream kernel and extract information from multiple versions of patched functions. 
+2. (For source/binary snapshot targets) After a patch is applied in upstream kernel, the patched function may evolve with time. The patched function in target kernel may be similar to any version of patched function in upstream kernel. To achieve higher accuracy, we keep track of the patched functions in upstream kernel and extract information from multiple versions of patched functions. 
 
 ## 0x0 Environment Setup
 
@@ -59,11 +59,11 @@ Here are some examples of lines in output file:
 
 2) CVE-2019-10499 None
 
-    We do not find patch-related files of CVE-2019-10499 in the branch. (Thus, this patch may be not applicable for the branch) 
+    We do not find patch-related files of CVE-2019-10499 in the branch. (Thus, this patch is not applicable for the branch) 
 
 3) CVE-2019-2331 [] []
 
-    We find patch-related files of CVE-2019-2331 but we do not find the commit corresponding the patch in target branch. (Thus, this patch may have not been applied to the branch)
+    We find patch-related files of CVE-2019-2331 but we do not find the commit corresponding the patch in target branch. Thus, this patch may have not been applied to the branch. Note that it does not necessarily means that the target branch is vulnerable. Maybe the patch-related file won't be compiled, or is removed in the development of the branch.
 
 4) CVE-2019-2328 [] ['dce0f8189f75',...]
 
