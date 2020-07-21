@@ -36,13 +36,16 @@ With the commit number, we can extract useful informations (e.g., introduction m
 
 3. The patch-related upstream repositories in Patches info file. We can extract information of patch from it.
 
-**Note**: Please set the repo paths in helper_zz.py get_repopath() function. With this function we can get the path to the repository directory.  The repo names in get_repopath() should be consistent with those in patches info file.
+**Note**: Please set the repo paths in ./helpers/helper_zz.py get_repopath() function. With this function we can get the path to the repository directory.  The repo names in get_repopath() should be consistent with those in patches info file.
 
-`~/Patchlocator$ python Patch_locator.py [targetrepo] [targetbranch] [patches info file]`
+`~/Patchlocator$ python Overall_patch_locator.py repo [targetrepo] [targetbranch] [patches info file]`
 
 - *targetrepo*: Target repo name. For example, [msm-4.9](https://source.codeaurora.org/quic/la/kernel/msm-4.9/).
 - *targetbranch*: Target branch name. For example, kernel.lnx.4.9.r25-rel. From the tag "LA.UM.8.3.r1", we know it corresponds [snapdragon 845, Android 10](https://wiki.codeaurora.org/xwiki/bin/QAEP/release). 
 - *patches info file*: Path to required patches info file mentioned above.
+
+**example**:
+`~/Patchlocator$ python Overall_patch_locator.py repo msm-4.9 kernel.lnx.4.9.r25-rel patches_info`
 
 **output**:
 ~/Patchlocator/output/upstreamresults/[targetrepo]/[targetbranch]. It's a file that stores the results of patch locating for target branch. For example, examples/output/upstreamresults/msm-4.9/kernel.lnx.4.9.r25-rel.
@@ -87,6 +90,9 @@ For example, we want to determine if a CVE is patched in a source code snapshot 
 - *patches info file*: The path to patches info file.
 - *target kernel*: The path to target source code kernel. We can have multiple target kernels here. (match them one by one).
 
+**example**:
+`~/Patchlocator$ python Overall_patch_locator.py source msm-4.9 kernel.lnx.4.9.r25-rel patches_info ./examples/target_kernel_source/`
+
 **output**:
 
 [targetkernel]/matchresults where P means the related patch has been adopted, N means the related patch has not been adopted and None means the patch-related function is not found in targetkernel. (eg. examples/target_kernel_source/matchresults)
@@ -105,7 +111,7 @@ Similar to source code snapshot, when the target kernel is a binary image snapsh
 
 `~/Patchlocator$ cd helpers;git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9;source environ.sh`
 
-Download GCC tools which are used in cross-compiling kernels and set up the environmental variables.
+    Download GCC tools which are used in cross-compiling kernels and set up the environmental variables.
 
 `~/Patchlocator$ python Overall_patch_locator.py binary [reference repo] [reference branch] [patches info file] [config] [target kernel1] [target kernel2] ...`
 
@@ -114,6 +120,9 @@ Download GCC tools which are used in cross-compiling kernels and set up the envi
 - *patches info file*: The path to patches info file.
 - *config*: The name of config file used in compiling reference kernels. For example, sdm845-perf. It must exists in the arch/arm64/configs directory of reference repository.
 - *target kernel*: The path to target binary code kernel. [target kernel]/boot (binary image) is the binary image. (eg. examples/target_kernel_binary/).  We can have multiple target kernels here.
+
+**example**:
+`~/Patchlocator$ python Overall_patch_locator.py binary msm-4.9 kernel.lnx.4.9.r25-rel patches_info sdm845-perf ./examples/target_kernel_binary/`
 
 **output**: 
 
