@@ -1,4 +1,4 @@
-import helper_zz
+import helpers.helper_zz as helper_zz
 import Patch_locator
 import Patch_evolution
 import Patch_matcher_src
@@ -36,13 +36,14 @@ def Locate_patch():
     repo=sys.argv[2]
     branch=sys.argv[3]
     patchesinfo=sys.argv[4]
-    config=sys.argv[5]
-    targetkernel_list=sys.argv[6:]
     if mode == 'repo':
         Locate_patch_repository(repo,branch,patchesinfo)
     elif mode == 'source':
+        targetkernel_list=sys.argv[5:]
         Locate_patch_sourcecodesnapshot(repo,branch,patchesinfo,targetkernel_list)
     elif mode == 'binary':
+        config=sys.argv[5]
+        targetkernel_list=sys.argv[6:]
         Locate_patch_binarysnapshot(repo,branch,patchesinfo,config,targetkernel_list)
     else:
         print 'invalid mode',mode,'not in ["repo","source","binary"]'
