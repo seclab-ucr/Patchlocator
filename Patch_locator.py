@@ -1,5 +1,5 @@
 #from commitnumber import *
-import helper_zz
+import helpers.helper_zz as helper_zz 
 from multiprocessing import Pool
 import re
 import time
@@ -7,7 +7,7 @@ import subprocess
 import pickle
 import os,sys
 import datetime
-import src_parser 
+import helpers.src_parser as src_parser 
 import ast
 
 def _trim_lines(buf):

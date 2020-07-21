@@ -1,5 +1,5 @@
 import sys,os
-import helper_zz
+import helpers.helper_zz as helper_zz
 import pickle
 
 def compare_sourcecode(branch,targetpath):

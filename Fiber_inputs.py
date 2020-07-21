@@ -1,8 +1,8 @@
 #this file is used for generating inputs of fiber
 #input the "Patch_evolution_"+branch+"_pickle" from patchevolution.py
-import helper_zz
-import compile_kernels
-import get_debuginfo
+import helpers.helper_zz as helper_zz
+import helpers.compile_kernels as compile_kernels
+import helpers.get_debuginfo as get_debuginfo
 import os,sys
 import pickle
 from shutil import copyfile
@@ -11,8 +11,6 @@ from shutil import copyfile
 refsourcepath = os.getcwd()+'/Fiberinputs/refsources'
 #directory that stores reference kernel binary/symbol table/vmlinux/debuginfo
 refkernelpath = os.getcwd()+'/Fiberinputs/refkernels'
-#the config file name when compiling reference kernel
-config='sdm845-perf'
 
 # used for getting patch-related source codes of reference kernel.
 def get_refsources(repo,branch):
@@ -40,8 +38,8 @@ def get_refsources(repo,branch):
                 helper_zz.command(string1)
 
 #used for getting binary image/symbol table/vmlinux of reference kernel. We will compile reference kernels here
-def get_refkernels(repo,branch):
-    global refkernelpath,config
+def get_refkernels(repo,branch,config):
+    global refkernelpath
     if not os.path.exists(refkernelpath):
         os.makedirs(refkernelpath)
     pickle_in = open("output/Patch_evolution_"+branch+"_pickle",'rb')
@@ -192,7 +190,7 @@ def generate_matchcommands_target(branch,targetkernelpath):
         return
     symbletable_path=targetkernelpath+"/"+"System.map"
     if not os.path.exists(symbletable_path):
-        string1='./ext_sym '+targetkernelpath+'/boot > '+targetkernelpath+'/System.map'
+        string1='./helpers/ext_sym '+targetkernelpath+'/boot > '+targetkernelpath+'/System.map'
         result=helper_zz.command(string1)
 
     global refsourcepath,refsourcepath,config
@@ -214,8 +212,9 @@ def generate_matchcommands_target(branch,targetkernelpath):
 if __name__ == '__main__':
     repo = sys.argv[1]
     branch = sys.argv[2]
+    config = sys.argv[3]
     get_refsources(repo,branch)
-    get_refkernels(repo,branch)
+    get_refkernels(repo,branch,config)
     
     Get_debuginfo()
     get_patches(repo,branch)
@@ -223,5 +222,5 @@ if __name__ == '__main__':
     generate_pickcommands(branch)
     generate_extcommands(branch)
     generate_matchcommands_ref(branch)
-    for targetkernel in sys.argv[3:]:
+    for targetkernel in sys.argv[4:]:
         generate_matchcommands_target(branch,targetkernel)

@@ -1,5 +1,5 @@
-import helper_zz
-import src_parser
+import helpers.helper_zz as helper_zz
+import helpers.src_parser as src_parser
 import sys
 import pickle
 import copy
