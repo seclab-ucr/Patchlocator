@@ -31,11 +31,9 @@ def get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog)
     for line in commitlog:
         if simpleintroduction in line:
             notecandidates +=[line[:12]]
-    if len(notecandidates)==1:
-        return [notecandidates[0]+' '+helper_zz.get_maincommit(targetrepopath,targetbranch,notecandidates[0])],[]
-    elif len(notecandidates)>1:
-        maincommit = helper_zz.get_maincommit(targetrepopath,targetbranch,notecandidates[-1])
-        return [notecandidates[-1]+' '+maincommit],[]
+    if len(notecandidates) > 0:
+         maincommits = [helper_zz.get_maincommit(targetrepopath,targetbranch,commit) for commit in notecandidates]
+         return helper_zz.get_earliest_commits(targetrepopath,targetbranch,maincommits)
 
     #If no results from introduction, we need to use content of patch to locate the patch commit
     helper_zz.checkoutcommit(targetrepopath,targetbranch)
@@ -80,7 +78,7 @@ def get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog)
     
     patchfiles=newpatchfiles
     if len(commitcandidates)==0:
-        return (None,None)
+        return None
     commitcandidateslist = [(commitcandidate,p_buf,targetrepopath) for commitcandidate in commitcandidates]
     if len(commitcandidateslist)> 120:
         logresult([cve,"too many candidates:",len(commitcandidateslist)])
@@ -110,21 +108,23 @@ def get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog)
             continue
         fuzzcommits.add(commitcandidate)
     
+    if len(strictcommits) > 0:
+        maincommits = [helper_zz.get_maincommit(targetrepopath,targetbranch,commit) for commit in strictcommits]
+        return helper_zz.get_earliest_commits(targetrepopath,targetbranch,maincommits)
     #this CVE may be patched when initialization
-    if len(strictcommits)==0 and len(fuzzcommits)==0:
-        #try to check if patched in initial commit'
-        initcommit=get_initcommit(targetrepopath,patchfiles)
-        if initcommit:
-            #checkout the files when initialization
-            updatedfiles=helper_zz.checkoutfiles_commit(targetrepopath,initcommit,patchfiles)
-            #match the change sites
-            inf=src_parser.parse_patch(patchPath,targetrepopath,changefiles2)
-            #restore the files of target branch
-            updatedfiles=helper_zz.checkoutfiles_commit(targetrepopath,targetbranch,patchfiles)
-            if len(inf) >0:
-                #logresult([cve,'should be patched in initial commit',initcommit])
-                return (['initialization commit '+initcommit],[])
-    return (list(strictcommits),list(fuzzcommits))
+    #try to check if patched in initial commit'
+    initcommit=get_initcommit(targetrepopath,patchfiles)
+    if initcommit:
+        #checkout the files when initialization
+        updatedfiles=helper_zz.checkoutfiles_commit(targetrepopath,initcommit,patchfiles)
+        #match the change sites
+        inf=src_parser.parse_patch(patchPath,targetrepopath,changefiles2)
+        #restore the files of target branch
+        updatedfiles=helper_zz.checkoutfiles_commit(targetrepopath,targetbranch,patchfiles)
+        if len(inf) >0:
+            #logresult([cve,'should be patched in initial commit',initcommit])
+            return 'initialization commit '+initcommit
+    return list(fuzzcommits)
 
 def get_initcommit(kernel,patchfiles):
     patchfile=list(patchfiles)[0]
@@ -172,7 +172,6 @@ def patchlocator(targetrepo,targetbranch,patchesinfo):
     global Targetrepo,Targetbranch
     Targetrepo = targetrepo
     Targetbranch = targetbranch
-    cve_strictcommit={}
 
     outputdir = 'output/upstreamresults/'+targetrepo
     if not os.path.exists(outputdir):
@@ -192,16 +191,13 @@ def patchlocator(targetrepo,targetbranch,patchesinfo):
         if targetrepo == "android" or targetrepo == "linux":
             if "linux" not in repo and "common" not in repo:
                 continue
-        (strictlist,fuzzlist)=get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog)
-        if type(strictlist)==list:
-            if len(strictlist) ==1 and len(fuzzlist)==0:
-                cve_strictcommit[cve]=strictlist[0]
-                logresult([cve,strictlist[0],helper_zz.get_commitdate(targetrepopath,strictlist[0].split(' ')[-1])])
-            else:
-                logresult([cve,strictlist,fuzzlist])
-        elif strictlist==None:
-            cve_strictcommit[cve]='None'
-            logresult([cve,'None'])
+        result =get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog)
+        if type(result)==str:
+            if 'initcommit' in result:
+                result= result.split(' ')[1]
+            logresult([cve,result,helper_zz.get_commitdate(targetrepopath,result)])
+        else:
+            logresult([cve,result])
 
 if __name__ == '__main__':
     targetrepo=sys.argv[1]

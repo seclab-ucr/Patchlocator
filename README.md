@@ -26,25 +26,25 @@ Pygments modules required. `sudo pip install Pygments` to install it.
 
 To locate a patch in target kernels, at first, we need to collect information of the patches. Specifically, this tool requires the corresponding patch commit number in upstream repository. We can get them from vulnerability/patch release websites (e.g., [Android security bulletin](https://source.android.com/security/bulletin) and [NATIONAL VULNERABILITY DATABASE](https://nvd.nist.gov/vuln/full-listing)). For each vulnerability there is usually a link to the patch commit in upstream kernel repository. 
 
-With the commit number, we can extract useful information (e.g., introduction message) about the patch from upstream repository, then we can make use of them to locate the patch in a given target repository/branch. Note that this tool only requires the commit number. For any given patch commit, whether it is a vulnerability patch or not, we can locate it in target repository. 
+With the commit number, we can extract useful information (e.g., introduction message) about the patch from upstream repository, then we can make use of them to locate the patch in a given target repository/branch. Note that this tool only requires the commit number. For any given patch commit, whether it is a security patch or other bug fix, we can locate it in target repository. 
  
 **required**: 
 
-1. [targetrepo]: The target repository where we want to locate patches.
+1. [targetrepo]: The target repository where we want to locate patches (which may or may not be present).
 
-2. [patches info file]: Patches info file contains basic information of patches we want to locate. Specifically, in each line of patches info file, there is a patch name (for example, CVE number), a corresponding upstream repository name (for example, Linux), and a corresponding commit number. We prepare an example file (./patches_info) which contains some CVEs in Android security bulletin.
+2. [patch info file]: Patches info file contains basic information of patches we want to locate. Specifically, in each line of patch info file, there is a patch name (for example, CVE number), a corresponding upstream repository name (for example, Linux), and a corresponding commit number. We prepare an example file (./patches_info) which contains some CVEs in Android security bulletin.
 
 3. The patch-related upstream repositories in Patches info file. We can extract information of patch from it.
 
-**Note**: Please set the repo paths in ./helpers/helper_zz.py get_repopath() function. With this function we can get the path to the repository directory.  The repo names in get_repopath() should be consistent with those in patches info file.
+**Note**: Please set the repo paths in ./helpers/helper_zz.py get_repopath() function. With this function we can get the path to the repository directory.  The repo names in get_repopath() should be consistent with those in patch info file.
 
 **usage**:
 
-`~/Patchlocator$ python Overall_patch_locator.py repo [targetrepo] [targetbranch] [patches info file]`
+`~/Patchlocator$ python Overall_patch_locator.py repo [targetrepo] [targetbranch] [patch info file]`
 
 - *targetrepo*: Target repo name. For example, [msm-4.9](https://source.codeaurora.org/quic/la/kernel/msm-4.9/).
 - *targetbranch*: Target branch name. For example, kernel.lnx.4.9.r25-rel. From the tag "LA.UM.8.3.r1", we know it corresponds [snapdragon 845, Android 10](https://wiki.codeaurora.org/xwiki/bin/QAEP/release). 
-- *patches info file*: Path to required patches info file mentioned above.
+- *patch info file*: Path to required patch info file mentioned above.
 
 **example**:
 `~/Patchlocator$ python Overall_patch_locator.py repo msm-4.9 kernel.lnx.4.9.r25-rel patches_info`
@@ -52,21 +52,21 @@ With the commit number, we can extract useful information (e.g., introduction me
 **output**:
 ~/Patchlocator/output/upstreamresults/[targetrepo]/[targetbranch]. It is a file that stores the results of patch locating for target branch. For example, examples/output/upstreamresults/msm-4.9/kernel.lnx.4.9.r25-rel.
 
-Here are some examples of lines in output file:
+Here are some example lines in output file:
 
-1) CVE-2019-2287 f920e8539ff2 de6abb23dc05 (2019, 2, 22).
+1) CVE-2019-2287 de6abb23dc05 (2019, 2, 22).
 
-    CVE-2019-2287 is patched with commit f920e8539ff2, which is in the upstream of target branch. Then f920e8539ff2 is merged into target branch with the merge commit de6abb23dc05. The commit date of de6abb23dc05 is 2/22/2019, thus we think CVE-2019-2287 is patched in target branch (kernel.lnx.4.9.r25-rel) at 2/22/2019.
+    CVE-2019-2287 is patched with commit de6abb23dc05. The commit date of de6abb23dc05 is 2/22/2019, thus we think CVE-2019-2287 is patched in target branch (kernel.lnx.4.9.r25-rel) on 2/22/2019.
 
 2) CVE-2019-10499 None
 
     We do not find patch-related files of CVE-2019-10499 in the branch. (Thus, this patch is not applicable for the branch) 
 
-3) CVE-2019-2331 [] []
+3) CVE-2019-2331 []
 
     We find patch-related files of CVE-2019-2331 but we do not find the commit corresponding the patch in target branch. Thus, this patch may have not been applied to the branch. Note that it does not necessarily means that the target branch is vulnerable. Maybe the patch-related file won't be compiled, or is removed in the development of the branch.
 
-4) CVE-2019-2328 [] ['dce0f8189f75',...]
+4) CVE-2019-2328 ['dce0f8189f75',...]
 
     We do not find any commit that can be strictly matched with the original patch commit. But we get several commits that may be related to the patch. The users can check them manually or ignore this patch for the moment.
 
@@ -76,22 +76,22 @@ When target kernel is a source code snapshot, an intuitive method is doing strin
 
 To solve the above problems, 1) we choose a reference upstream repository which is similar to target kernel. We extract patched functions from the reference repository instead of the original upstream repository. 2) we track evolution of patched functions in reference repository to collect multiple versions of patched functions.
 
-For example, we want to determine if a CVE is patched in a source code snapshot of OEM phone. The CVE is originally patched in Linux kernel (original upstream kernel), and then the patch is propagated to Qualcomm kernel which is the direct upstream kernel of the OEM kernel. We locate the patch in corresponding Qualcomm branch (reference upstream kernel) and track the patch evolution on it. After that we extract all versions of patched functions in the Qualcomm branch and match them with target OEM source code snapshot. If any of them matches, we think the CVE is patched in the target source code snapshot.
+For example, we want to determine if a CVE is patched in a source code snapshot of OEM phone. The CVE is originally patched in Linux kernel (original upstream kernel), and then the patch is propagated to Qualcomm kernel which is the direct upstream kernel of the OEM kernel. We locate the patch in the corresponding Qualcomm branch (reference upstream kernel) and track the patch evolution on it. After that we extract all versions of patched functions in the Qualcomm branch and match them with target OEM source code snapshot. If any of them matches, we think the CVE is patched in the target source code snapshot.
 
 **required**: 
 1. [reference repo]: The repository where we want to track evolutions of the patch-related functions.
 
-2. [patches info file]: It has been introduced in 0x1.
+2. [patch info file]: It has been introduced in 0x1.
 
 3. [target kernel]: Target source code kernel.
 
 **usage**:
 
-`~/Patchlocator$ python Overall_patch_locator.py source [reference repo] [reference branch] [patches info file] [target kernel1] [target kernel2] ...`
+`~/Patchlocator$ python Overall_patch_locator.py source [reference repo] [reference branch] [patch info file] [target kernel1] [target kernel2] ...`
 
 - *reference repo*: The name of reference repository.
 - *reference branch*: The name of reference branch where we want to track evolutions of the patches.
-- *patches info file*: The path to patches info file.
+- *patch info file*: The path to patch info file.
 - *target kernel*: The path to target source code kernel. We can have multiple target kernels here. (match them one by one).
 
 **example**:
@@ -109,21 +109,21 @@ Like source code snapshot, when the target kernel is a binary image snapshot, we
 **required**:
 1. [reference repo]: The repository where we want to track evolutions of the patches.
 
-2. [patches info file]: It has been introduced in 0x1.
+2. [patch info file]: It has been introduced in 0x1.
 
 3. [target kernel]: Target binary kernel. We can have multiple target kernels here.
 
 4. Download GCC tools which are used in cross-compiling kernels and set up the environmental variables. Execute the following command to get them.
 
-**usage**:
-
 `~/Patchlocator$ cd helpers;git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9;source environ.sh`
 
-`~/Patchlocator$ python Overall_patch_locator.py binary [reference repo] [reference branch] [patches info file] [config] [target kernel1] [target kernel2] ...`
+**usage**:
+
+`~/Patchlocator$ python Overall_patch_locator.py binary [reference repo] [reference branch] [patch info file] [config] [target kernel1] [target kernel2] ...`
 
 - *reference repo*: The name of reference.
 - *reference branch*: The name of reference branch where we track the patches.
-- *patches info file*: The path to patches info file.
+- *patch info file*: The path to patch info file.
 - *config*: The name of config file used in compiling reference kernels. For example, sdm845-perf. It must exist in the arch/arm64/configs directory of reference repository.
 - *target kernel*: The path to target binary code kernel. [target kernel]/boot (binary image) is the binary image. (e.g. examples/target_kernel_binary/).  We can have multiple target kernels here.
 
@@ -131,10 +131,6 @@ Like source code snapshot, when the target kernel is a binary image snapshot, we
 `~/Patchlocator$ python Overall_patch_locator.py binary msm-4.9 kernel.lnx.4.9.r25-rel patches_info sdm845-perf ./examples/target_kernel_binary/`
 
 **output**: 
-
-Fiberinputs/refsources: patch-related source codes of reference kernels. (e.g., examples/Fiberinputs/refsources)
-
-Fiberinputs/refkernels: binary image/symbol table/vmlinux of reference kernels. (e.g., examples/Fiberinputs/refkernels. Due to the oversize of vmlinux/debug info file, we don't include them in example directory)
 
 Fiberinputs/pickcommands: commands used in Fiber pick phase. (e.g., examples/Fiberinputs/pickcommands)
 

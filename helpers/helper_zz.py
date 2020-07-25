@@ -648,6 +648,17 @@ def get_maincommit(repopath,branch,commit):
     commoncommitlist = [commit for commit in resultlist1 if commit in resultlist2]
     return commoncommitlist[-1][:12]
 
+def get_earliest_commits(targetrepopath,targetbranch,commits):
+    diclist=[]
+    dic={}
+    for commit in commits:
+        dic['commit'] = commit
+        dic['commitdate']=get_commitdate(targetrepopath,commit)
+        localdic =  dic.copy()
+        diclist += [localdic]
+    diclist=sorted(diclist,key=lambda x:x['commitdate'])
+    return diclist[0]['commit']
+
 def command(string1):
     p=subprocess.Popen(string1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     result=p.stdout.readlines()
