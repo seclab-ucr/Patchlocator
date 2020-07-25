@@ -16,24 +16,15 @@ def trim_lines(buf):
         if buf[i][-1] == '\n':
             buf[i] = buf[i][:-1]
 #require hard code
-def get_repopath(repo):
-    repo_path = {
-            'msm':"/home/zheng/fiberweiteng/msm-3.4",
-            'msm-3.4':"/home/zheng/fiberweiteng/msm-3.4",
-            'msm-3.10':"/home/zheng/fiberweiteng/msm-3.10",
-            'msm-3.18':"/home/zheng/fiberweiteng/msm-3.18",
-            'msm-4.4':"/home/zheng/fiberweiteng/msm-4.4",
-            'msm-4.9':"/home/zheng/fiberweiteng/msm-4.9",
-            'msm-4.14':"/home/zheng/fiberweiteng/msm-4.14",
-            'linux':"/home/zheng/fiberweiteng/linux_stable/linux",
-            'common':"/home/zheng/fiberweiteng/common",
-            'android':"/home/zheng/fiberweiteng/common",
-            'androidmsm':"/home/zheng/fiberweiteng/msm",
-            'pixel':"/home/zheng/fiberweiteng/msm",
-            'oneplus5':"/data1/zheng/opensource/android_kernel_oneplus_msm8998",
-            }
-    if repo in repo_path:
-        return repo_path[repo]
+def get_repopath(Repo):
+    repo_path={}
+    with open('repopath.txt','r') as f:
+        s_buf = f.readlines()
+    for line in s_buf:
+        repo,path=line[:-1].split(' ')
+        repo_path[repo]=path
+    if Repo in repo_path:
+        return repo_path[Repo]
     return None
 
 def checkoutcommit(kernel,commit):
