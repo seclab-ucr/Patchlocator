@@ -150,7 +150,7 @@ Finally, you can execute the commands in E-Fiber directory, the commands can be 
 
 **Patch_locator.py**: stores helper function that locates a patch in given branch.
 
-**Patch_evolution.py**: stores helper function that tracks evolution of given patch-related function in in given branch.
+**Patch_evolution.py**: stores helper function that tracks evolution of given patch-related function in the given branch.
 
 **Fiber_inputs.py**: stores helper function that generates input of E-Fiber.
 
