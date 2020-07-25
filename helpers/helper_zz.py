@@ -18,7 +18,7 @@ def trim_lines(buf):
 #require hard code
 def get_repopath(Repo):
     repo_path={}
-    with open('repopath.txt','r') as f:
+    with open('repo_path.txt','r') as f:
         s_buf = f.readlines()
     for line in s_buf:
         repo,path=line[:-1].split(' ')
