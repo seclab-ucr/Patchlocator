@@ -36,7 +36,7 @@ With the commit number, we can extract useful information (e.g., introduction me
 
 3. The patch-related upstream repositories in Patches info file. We can extract information of patch from it.
 
-**Note**: Please set the repo paths in repo_path.txt. With this function we can get the path to the repository directory.  The repo names in repo_path.txt should be consistent with those in patch info file.
+**Note**: Please set the repo paths in repo_path.txt. With this file we can get the path to the repository directory.  The repo names in repo_path.txt should be consistent with those in patch info file.
 
 **usage**:
 
