@@ -1,5 +1,5 @@
 #[name] [repo name] [commit number]
-#repo name should be consistent with the keys of dictionary repo_path in get_repopath function in helper_zz.py.
+#repo name should be consistent with the repo_path.txt.
 CVE-2019-2287 msm-3.18 9c0fa2ad7dab
 CVE-2019-2260 msm-4.9 3186af9f3ece
 CVE-2019-2328 msm-4.4 f9559ef56f45
@@ -9,9 +9,7 @@ CVE-2019-10499 msm-4.14 e5f79b37300b
 CVE-2019-10538 msm-4.9 e0d510ff0fcb
 CVE-2019-2279 msm-4.9 fabef69dd6ba
 CVE-2019-10529 msm-3.10 7a606e2b63e3
-CVE-2019-2324 msm-3.10 eec4580e5f47
 CVE-2019-10524 msm-3.18 73e75fbec9c1
-CVE-2019-2332 msm-3.18 bf4c2c02be57
 CVE-2019-2283 msm-4.4 477409de280b
 CVE-2019-2323 msm-4.4 8ae699e72e39
 CVE-2019-2325 msm-4.4 af09cb8b39a3
