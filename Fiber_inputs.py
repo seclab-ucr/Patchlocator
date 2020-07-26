@@ -123,7 +123,7 @@ def generate_pickcommands(branch,config):
                 f.write(localrefsourcepath+'/'+cve)
             pickcommand = 'python pick_sig.py '+patchlistfile+' '+localrefsourcepath+' '+outputpath+' '+localrefkernelpath
             pickcommands += [pickcommand]
-    with open('./Fiberinputs/pickcommands','w') as f:
+    with open('./output/Fiberinputs/pickcommands','w') as f:
         for line in pickcommands:
             f.write(line+'\n')
 
@@ -140,7 +140,7 @@ def generate_extcommands(branch,config):
             localrefsourcepath = refsourcepath+'/'+cve+'/'+afterpatchcommit
             extcommand = 'python ext_sig.py '+localrefkernelpath+' '+localrefsourcepath
             extcommands += [extcommand]
-    with open('Fiberinputs/extcommands','w') as f:
+    with open('output/Fiberinputs/extcommands','w') as f:
         for line in extcommands:
             f.write(line+'\n')
 
@@ -175,12 +175,12 @@ def generate_matchcommands_ref(branch,config):
             copyfile(unpatchkernelpath+'/boot',kernelpath+'/boot')
             copyfile(unpatchkernelpath+'/System.map',kernelpath+'/System.map')
 
-            matchcommand = 'python match_sig.py '+sigspath+' 0'
+            matchcommand = 'python match_sig.py '+sigspath+' 0 '+ sigspath+'/refkernel'
             matchcommands1 += [matchcommand]
-            matchcommand = 'python match_sig.py '+sigspath+' 2'
+            matchcommand = 'python match_sig.py '+sigspath+' 2 '+sigspath+'/refkernel'+' '+sigspath+'/unpatchkernel'
             matchcommands2 += [matchcommand]
     matchcommands = matchcommands1 + matchcommands2
-    with open('Fiberinputs/matchcommands_ref','w') as f:
+    with open('output/Fiberinputs/matchcommands_ref','w') as f:
         for line in matchcommands:
             f.write(line+'\n')
 
@@ -202,9 +202,11 @@ def generate_matchcommands_target(branch,targetkernelpath,config):
         print 'generate matchcommands(target kernel) for',cve
         for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
             sigspath = refsourcepath+'/'+cve+'/'+afterpatchcommit
-            matchcommand = 'python match_sig.py '+sigspath+' 1 '+targetkernelpath
+            refkernel=sigspath+'/refkernel'
+            unpatchkernel = sigspath+'/unpatchkernel'
+            matchcommand = 'python match_sig.py '+sigspath+' 1 '+refkernel+' '+unpatchkernel+' '+targetkernelpath
             matchcommands += [matchcommand]
-    with open('Fiberinputs/matchcommands_target','w') as f:
+    with open('output/Fiberinputs/matchcommands_target','w') as f:
         for line in matchcommands:
             f.write(line+'\n')
 
