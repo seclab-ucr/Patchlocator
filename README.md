@@ -20,7 +20,7 @@ The key insights are:
 
 The scripts are based on python2.7.
 
-Pygments modules required. `sudo pip install Pygments` to install it.
+Some modules required. `sudo pip install Pygments;sudo apt-get install libssl-dev`.
 
 ## 0x1 Locating patches in a repository branch.
 
