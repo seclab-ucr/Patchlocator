@@ -47,7 +47,7 @@ def Patchevolution_tracker(repo,branch,patches_info):
         line=line[:-1]
         if any(ignore in line for ignore in ['#','[]','None','too many candidates','not exist','initcommit','fail']):
             continue
-        cve,commit,maincommit = line.split(" ")[:3]
+        cve,maincommit = line.split(" ")[:2]
         print 'Patch evolution tracking for',cve
         beforecommit=helper_zz.get_previouscommit(repopath,maincommit)
         (cve,original_repo,original_commit)=cve_info[cve]
