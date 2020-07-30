@@ -115,7 +115,7 @@ Like source code snapshot, when the target kernel is a binary image snapshot, we
 
 4. Download GCC tools which are used in cross-compiling kernels and set up the environmental variables. Execute the following command to get them and checkout to a stable version.
 
-`~/Patchlocator$ cd helpers;git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9;git checkout -f android-wear-8.0.0_r2;source environ.sh`
+`~/Patchlocator$ cd helpers;git clone https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9;git checkout -f android-wear-8.0.0_r2;source environ.sh;cd ..`
 
 **usage**:
 
