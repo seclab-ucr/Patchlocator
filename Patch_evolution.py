@@ -20,7 +20,7 @@ def get_mainfilecommits(repopath,branch,filename):
     mainfilecommits=[]
     resultbuf.reverse()
     for line in resultbuf:
-        commit=line[:12]
+        commit=line[:7]
         mainfilecommits+= [commit]
     return mainfilecommits
 

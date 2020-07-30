@@ -394,7 +394,7 @@ def get_candidate_commitnumbers2(repository, file_name):
                 return set([]),file_name
             newfilename=get_newfilename(repository,candidates_buf,file_name)
     for line in candidates_buf:
-        commitnumber=line[:12]
+        commitnumber=line[:7]
         candidates.add(commitnumber)
     #print "for file ",file_name," candidates: ",str(candidates)
     return candidates,newfilename
@@ -410,7 +410,7 @@ def get_candidate_commitnumbers3(repository, branch,filename=None):
     candidates_buf=p.stdout.readlines()
     candidates_buf.reverse()
     for line in candidates_buf:
-        commitnumber=line[:12]
+        commitnumber=line[:7]
         candidates+= [commitnumber]
     return candidates
 
@@ -418,7 +418,7 @@ def get_candidate_commitnumbers3(repository, branch,filename=None):
 def get_newfilename(repository,candidates_buf,oldfilename):
     print 'oldfilename:',oldfilename
     for line in candidates_buf:
-        commitnumber=line[:12]
+        commitnumber=line[:7]
         print repository,commitnumber
         filenames=get_filenames_commit(repository,commitnumber)
         for (fn,fp) in filenames:
@@ -637,7 +637,7 @@ def get_maincommit(repopath,branch,commit):
     string1='cd '+repopath+';git rev-list '+commit+'..'+branch+' --first-parent'
     resultlist2=command(string1)
     commoncommitlist = [commit for commit in resultlist1 if commit in resultlist2]
-    return commoncommitlist[-1][:12]
+    return commoncommitlist[-1][:7]
 
 def get_earliest_commits(targetrepopath,targetbranch,commits):
     diclist=[]
@@ -667,14 +667,14 @@ def get_previouscommit(kernel,commit):
     else:
         string1="cd "+kernel+";git log --oneline "+commit
         p_buf=command(string1)
-        prevcommit=p_buf[1][:12]
+        prevcommit=p_buf[1][:7]
     return prevcommit
 
 def get_currentcommit(kernel):
     string1="cd "+kernel+";git log -2 --oneline "
     p=subprocess.Popen(string1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     p_buf=p.stdout.readlines()
-    commit1=p_buf[0][:12]
+    commit1=p_buf[0][:7]
     return commit1
 
 def get_commit_content(kernel,commit):
