@@ -236,7 +236,7 @@ def get_author(c_buf):
         if line.startswith("Author:"):
             #linelist=line.split(" ")
             #author=linelist[-2]
-            author=line[7:]
+            author=line[12:]
             author.strip()
             return author
 
@@ -358,14 +358,14 @@ def get_commitinformation(kernel,commitnumber):
     return dicinfo
 
 def get_commitlog(kernel,commitnumber):
-    string1="cd "+kernel+";git log --oneline "+ commitnumber
+    string1="cd "+kernel+";git log --pretty=oneline "+ commitnumber
     p=subprocess.Popen(string1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     commitlog=p.stdout.readlines()
     return commitlog
 
 def get_candidate_commitnumbers2(repository, file_name):
     candidates=set()
-    string1="cd "+repository+";git log --oneline -- -p -follow "+file_name
+    string1="cd "+repository+";git log --pretty=oneline -- -p -follow "+file_name
     #print string1
     p=subprocess.Popen(string1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     candidates_buf=p.stdout.readlines()
@@ -377,24 +377,24 @@ def get_candidate_commitnumbers2(repository, file_name):
         resultlist=command(string1)
         if len(resultlist)==1:
             newfilename=resultlist[0][:-1]
-            string1="cd "+repository+";git log --oneline -- -p -follow "+newfilename
+            string1="cd "+repository+";git log --pretty=oneline -- -p -follow "+newfilename
             p=subprocess.Popen(string1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             candidates_buf=p.stdout.readlines()
         elif len(resultlist) >1:
             print 'multiple substitution'
             newfilename=resultlist[0][:-1]
-            string1="cd "+repository+";git log --oneline -- -p -follow "+newfilename
+            string1="cd "+repository+";git log --pretty=oneline -- -p -follow "+newfilename
             p=subprocess.Popen(string1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             candidates_buf=p.stdout.readlines()
         elif len(resultlist)==0:
-            string1="cd "+repository+";git log --oneline -- -p -follow */"+file_name
+            string1="cd "+repository+";git log --pretty=oneline -- -p -follow */"+file_name
             p=subprocess.Popen(string1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             candidates_buf=p.stdout.readlines()
             if len(candidates_buf)==0:
                 return set([]),file_name
             newfilename=get_newfilename(repository,candidates_buf,file_name)
     for line in candidates_buf:
-        commitnumber=line[:7]
+        commitnumber=line[:12]
         candidates.add(commitnumber)
     #print "for file ",file_name," candidates: ",str(candidates)
     return candidates,newfilename
@@ -403,14 +403,14 @@ def get_candidate_commitnumbers2(repository, file_name):
 def get_candidate_commitnumbers3(repository, branch,filename=None):
     candidates=[]
     if filename:
-        string1="cd "+repository+";git log --oneline --first-parent "+branch+' -- -p '+filename
+        string1="cd "+repository+";git log --pretty=oneline --first-parent "+branch+' -- -p '+filename
     else:
-        string1="cd "+repository+";git log --oneline --first-parent "+branch
+        string1="cd "+repository+";git log --pretty=oneline --first-parent "+branch
     p=subprocess.Popen(string1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     candidates_buf=p.stdout.readlines()
     candidates_buf.reverse()
     for line in candidates_buf:
-        commitnumber=line[:7]
+        commitnumber=line[:12]
         candidates+= [commitnumber]
     return candidates
 
@@ -418,7 +418,7 @@ def get_candidate_commitnumbers3(repository, branch,filename=None):
 def get_newfilename(repository,candidates_buf,oldfilename):
     print 'oldfilename:',oldfilename
     for line in candidates_buf:
-        commitnumber=line[:7]
+        commitnumber=line[:12]
         print repository,commitnumber
         filenames=get_filenames_commit(repository,commitnumber)
         for (fn,fp) in filenames:
@@ -637,7 +637,7 @@ def get_maincommit(repopath,branch,commit):
     string1='cd '+repopath+';git rev-list '+commit+'..'+branch+' --first-parent'
     resultlist2=command(string1)
     commoncommitlist = [commit for commit in resultlist1 if commit in resultlist2]
-    return commoncommitlist[-1][:7]
+    return commoncommitlist[-1][:12]
 
 def get_earliest_commits(targetrepopath,targetbranch,commits):
     diclist=[]
@@ -665,16 +665,16 @@ def get_previouscommit(kernel,commit):
                 break
         prevcommit=line.split(" ")[1]
     else:
-        string1="cd "+kernel+";git log --oneline "+commit
+        string1="cd "+kernel+";git log --pretty=oneline "+commit
         p_buf=command(string1)
-        prevcommit=p_buf[1][:7]
+        prevcommit=p_buf[1][:12]
     return prevcommit
 
 def get_currentcommit(kernel):
-    string1="cd "+kernel+";git log -2 --oneline "
+    string1="cd "+kernel+";git log -2 --pretty=oneline "
     p=subprocess.Popen(string1, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     p_buf=p.stdout.readlines()
-    commit1=p_buf[0][:7]
+    commit1=p_buf[0][:12]
     return commit1
 
 def get_commit_content(kernel,commit):

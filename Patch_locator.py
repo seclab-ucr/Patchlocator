@@ -30,7 +30,7 @@ def get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog)
     notecandidates=[]
     for line in commitlog:
         if simpleintroduction in line:
-            notecandidates +=[line[:7]]
+            notecandidates +=[line[:12]]
     if len(notecandidates) > 0:
          maincommits = [helper_zz.get_maincommit(targetrepopath,targetbranch,commit) for commit in notecandidates]
          return helper_zz.get_earliest_commits(targetrepopath,targetbranch,maincommits)
@@ -90,7 +90,7 @@ def get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog)
     filterbyfunction=0
     filterbydate=0
     for (commitcandidate, (notmatch,strictmatch,fuzzmatch)) in resultlist:
-        commitcandidate=commitcandidate[:7]
+        commitcandidate=commitcandidate[:12]
         information=helper_zz.get_commitinformation(targetrepopath,commitcandidate)
         if determinebyintro(simpleintroduction,information):
             strictcommits.add(commitcandidate)
@@ -128,13 +128,13 @@ def get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog)
 
 def get_initcommit(kernel,patchfiles):
     patchfile=list(patchfiles)[0]
-    string1='cd '+kernel+';git log --first-parent --oneline -- -p '+patchfile
+    string1='cd '+kernel+';git log --first-parent --pretty=oneline -- -p '+patchfile
     #print 'get_initcommit',string1
     result=helper_zz.command(string1)
     if len(result)==0:
         logresult([patchfile,'not exist in',kernel])
         return None
-    return result[-1][:7]
+    return result[-1][:12]
 
 def determinebyauthor(Author,authortime,infomation):
     if infomation['authortime'] == authortime and infomation['author']==Author :
@@ -177,10 +177,10 @@ def patchlocator(targetrepo,targetbranch,patchesinfo):
     if not os.path.exists(outputdir):
         os.makedirs(outputdir)
     targetrepopath=helper_zz.get_repopath(targetrepo)
-    string1='cd '+targetrepopath+';git log --first-parent --oneline '+targetbranch
+    string1='cd '+targetrepopath+';git log --first-parent --pretty=oneline '+targetbranch
     mainlog=helper_zz.command(string1)
-    mainlogcommits=[line[:7] for line in mainlog]
-    string1='cd '+targetrepopath+';git log --oneline '+targetbranch
+    mainlogcommits=[line[:12] for line in mainlog]
+    string1='cd '+targetrepopath+';git log --pretty=oneline '+targetbranch
     commitlog=helper_zz.command(string1)
     with open(patchesinfo,'r') as f:
         s_buf=f.readlines()

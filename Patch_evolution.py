@@ -15,12 +15,12 @@ def get_cveinfos(patches_info):
     return cve_info
 
 def get_mainfilecommits(repopath,branch,filename):
-    string1='cd '+repopath+';git log --oneline --first-parent '+branch+' -- -p '+filename
+    string1='cd '+repopath+';git log --pretty=oneline --first-parent '+branch+' -- -p '+filename
     resultbuf=helper_zz.command(string1)
     mainfilecommits=[]
     resultbuf.reverse()
     for line in resultbuf:
-        commit=line[:7]
+        commit=line[:12]
         mainfilecommits+= [commit]
     return mainfilecommits
 
