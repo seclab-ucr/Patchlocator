@@ -128,7 +128,7 @@ Like source code snapshot, when the target kernel is a binary image snapshot, we
 - *target kernel*: The path to target binary code kernel. [target kernel]/boot (binary image) is the binary image. (e.g. examples/target_kernel_binary/).  We can have multiple target kernels here.
 
 **example**:
-`~/Patchlocator$ python Overall_patch_locator.py binary msm-4.9 kernel.lnx.4.9.r25-rel patches_info sdm845-perf ./examples/target_kernel_binary/`
+`~/Patchlocator$ python Overall_patch_locator.py binary msm-4.9 kernel.lnx.4.9.r25-rel patches_info sdm845-perf ~/Patchlocator/examples/target_kernel_binary/`
 
 **output**: 
 
