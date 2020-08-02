@@ -45,7 +45,7 @@ def Patchevolution_tracker(repo,branch,patches_info):
         s_buf = f.readlines()
     for line in s_buf:
         line=line[:-1]
-        if any(ignore in line for ignore in ['#','[]','None','too many candidates','not exist','initcommit','fail']):
+        if any(ignore in line for ignore in ['#','[','None','too many candidates','not exist','initcommit','fail']):
             continue
         cve,maincommit = line.split(" ")[:2]
         print 'Patch evolution tracking for',cve
@@ -56,12 +56,12 @@ def Patchevolution_tracker(repo,branch,patches_info):
         cve_functioncontent[cve] ={}
         cve_commit_element_content[cve]={}
         cve_commit_element_content[cve]['beforecommit']=beforecommit
+        cve_commit_element_content[cve]['aftercommits']={}
         for filename in functiondic:
             aftercommits = get_afterpatchcommits(repopath,branch,filename,maincommit)
             if not aftercommits:
                 #todo file path change
                 continue
-            cve_commit_element_content[cve]['aftercommits']={}
             for afterpatchcommit in aftercommits:
                 if afterpatchcommit not in cve_commit_element_content[cve]['aftercommits']:
                     cve_commit_element_content[cve]['aftercommits'][afterpatchcommit]={}
