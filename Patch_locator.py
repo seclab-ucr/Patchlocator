@@ -17,7 +17,7 @@ def _trim_lines(buf):
                 buf[i] = buf[i][:-1]
 
 #given a CVE, locate the patch in a specific branch of specific repository
-def get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog):
+def get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog,maincommitlog):
     patchkernel=helper_zz.get_repopath(repo)
     targetrepopath=helper_zz.get_repopath(targetrepo)
     print 'Locating',cve,'in branch',targetbranch,'in repo',targetrepopath
@@ -32,7 +32,7 @@ def get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog)
         if simpleintroduction in line:
             notecandidates +=[line[:12]]
     if len(notecandidates) > 0:
-         maincommits = [helper_zz.get_maincommit(targetrepopath,targetbranch,commit) for commit in notecandidates]
+         maincommits = [helper_zz.get_maincommit(targetrepopath,targetbranch,commit,maincommitlog) for commit in notecandidates]
          return helper_zz.get_earliest_commits(targetrepopath,targetbranch,maincommits)
 
     #If no results from introduction, we need to use content of patch to locate the patch commit
@@ -52,6 +52,7 @@ def get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog)
     #set of (fn,fp)
     changefiles=helper_zz.get_files(p_buf)
     patchfiles=set([element[1] for element in changefiles])
+    patchfiles = set([filename for filename in patchfiles if filename != None])
     #changefiles2 is used to log the difference of file path between original patch and current branch
     changefiles2=set()
     newpatchfiles=set()
@@ -191,7 +192,7 @@ def patchlocator(targetrepo,targetbranch,patchesinfo):
         if targetrepo == "android" or targetrepo == "linux":
             if "linux" not in repo and "common" not in repo:
                 continue
-        result =get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog)
+        result =get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog,mainlogcommits)
         if type(result)==str:
             if 'initcommit' in result:
                 result= result.split(' ')[1]

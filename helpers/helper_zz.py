@@ -631,12 +631,14 @@ def get_newfuncname(repopath,commit,filename1,filename2,prevfuncname):
 
 
 #given a commit and a repo branch, try to get the corresponding commit in main branch.
-def get_maincommit(repopath,branch,commit):
+def get_maincommit(repopath,branch,commit,maincommitlog):
+    if any(commit in line for line in maincommitlog):
+        return commit
     string1='cd '+repopath+';git rev-list '+commit+'..'+branch+' --ancestry-path'
     resultlist1=command(string1)
     string1='cd '+repopath+';git rev-list '+commit+'..'+branch+' --first-parent'
     resultlist2=command(string1)
-    commoncommitlist = [commit for commit in resultlist1 if commit in resultlist2]
+    commoncommitlist = [commoncommit for commoncommit in resultlist1 if commoncommit in resultlist2]
     return commoncommitlist[-1][:12]
 
 def get_earliest_commits(targetrepopath,targetbranch,commits):
