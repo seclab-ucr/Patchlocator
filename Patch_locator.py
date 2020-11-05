@@ -19,6 +19,9 @@ def _trim_lines(buf):
 #given a CVE, locate the patch in a specific branch of specific repository
 def get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog,maincommitlog):
     patchkernel=helper_zz.get_repopath(repo)
+    if not os.path.exists(patchkernel):
+        print patchkernel,'not exists'
+        exit()
     targetrepopath=helper_zz.get_repopath(targetrepo)
     print 'Locating',cve,'in branch',targetbranch,'in repo',targetrepopath
     patchinfomation=helper_zz.get_commitinformation(patchkernel,commit)
