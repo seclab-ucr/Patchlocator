@@ -113,7 +113,7 @@ def get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog,
         fuzzcommits.add(commitcandidate)
     
     if len(strictcommits) > 0:
-        maincommits = [helper_zz.get_maincommit(targetrepopath,targetbranch,commit) for commit in strictcommits]
+        maincommits = [helper_zz.get_maincommit(targetrepopath,targetbranch,commit,maincommitlog) for commit in strictcommits]
         return helper_zz.get_earliest_commits(targetrepopath,targetbranch,maincommits)
     #this CVE may be patched when initialization
     #try to check if patched in initial commit'
