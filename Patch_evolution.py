@@ -32,7 +32,8 @@ def get_afterpatchcommits(repopath,branch,filename,patchcommit):
     index = mainfilecommits.index(patchcommit)
     return mainfilecommits[index:]
 
-#input: [repo] [branch] [patches info file] 
+#input: [repo] [branch] [patches info file]
+#input: patchlocator_result 
 #output: dictionary cve-filename-funcname-funccontent
 def Patchevolution_tracker(repo,branch,patches_info):
     repopath = helper_zz.get_repopath(repo)
