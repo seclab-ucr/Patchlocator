@@ -64,12 +64,19 @@ def get_patchfile(repopath,prevcommit,filename1,commit,filename2,funcnames):
     headstart=0
     head=p_buf[0]
     p_buf2 = []
+    local_pbuf = []
     for i in range(len(p_buf)):
         line = p_buf[i]
         if '@@' in line:
+            local_pbuf_str = ''.join(local_pbuf)
+            if 'diff' in head or any(funcname in local_pbuf_str for funcname in funcnames):
+                p_buf2 += local_pbuf
+            local_pbuf = []
             head = line
-        if 'diff' in head or any(funcname in head for funcname in funcnames):
-            p_buf2 += [line]
+        local_pbuf += [line]
+    local_pbuf_str = ''.join(local_pbuf)
+    if 'diff' in head or any(funcname in local_pbuf_str for funcname in funcnames):
+        p_buf2 += local_pbuf
     return p_buf2
 
 #elementset: set of (filename,funcname)
@@ -98,6 +105,8 @@ def get_patches(repo,branch):
         for afterpatchcommit in cve_commit_element_content[cve]['aftercommits']:
             commitpath = cvepath+'/'+afterpatchcommit
             elementset = cve_commit_element_content[cve]['aftercommits'][afterpatchcommit].keys()
+            print 'getpatchfile:'
+            print 'repo:',repo,'beforecommit:',beforecommit,'afterpatchcommit:',afterpatchcommit,'elementset:',elementset
             patchfile = generatepatchfile(repo,beforecommit,afterpatchcommit,elementset)
             if not patchfile:
                 print 'dont get patchfile for',afterpatchcommit,'beforecommit:',beforecommit
