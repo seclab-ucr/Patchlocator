@@ -127,7 +127,7 @@ def get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog,
         updatedfiles=helper_zz.checkoutfiles_commit(targetrepopath,targetbranch,patchfiles)
         if len(inf) >0:
             #logresult([cve,'should be patched in initial commit',initcommit])
-            return 'initialization commit '+initcommit
+            return 'initcommit '+initcommit
     return list(fuzzcommits)
 
 def get_initcommit(kernel,patchfiles):
