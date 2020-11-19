@@ -61,6 +61,9 @@ def Get_debuginfo():
 def get_patchfile(repopath,prevcommit,filename1,commit,filename2,funcnames):
     string1='cd '+repopath+';git diff '+prevcommit+':'+filename1+' '+commit+':'+filename2
     p_buf=helper_zz.command(string1)
+    #revert may results in no difference
+    if len(p_buf)==0:
+        return []
     headstart=0
     head=p_buf[0]
     p_buf2 = []
