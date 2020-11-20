@@ -218,7 +218,7 @@ def generate_matchcommands_target(branch,targetkernelpath,config):
             unpatchkernel = sigspath+'/unpatchkernel'
             matchcommand = 'python match_sig.py '+sigspath+' 1 '+refkernel+' '+unpatchkernel+' '+targetkernelpath
             matchcommands += [matchcommand]
-    with open('output/Fiberinputs/matchcommands_target','w') as f:
+    with open('output/Fiberinputs/matchcommands_target','a') as f:
         for line in matchcommands:
             f.write(line+'\n')
 
