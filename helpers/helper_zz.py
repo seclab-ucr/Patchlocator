@@ -917,3 +917,23 @@ def get_commitnumber_4_fuzz(head,clines,blines,alines,s_buf):
         else:
             i +=1
     return None
+
+#for each branch, we choose some fix points to generate signatures. It can help relieve the situation that signatures become unuseful with the evolution even if the function content is not changed.
+def get_chosencommits(repo,branch):
+    repopath = get_repopath(repo)
+    string = "cd "+repopath+';git log --first-parent --oneline '+branch+' Makefile'
+    s_buf = command(string)
+    
+    Finalversion = get_commitversion(repopath,branch)
+    thresholdversion = (Finalversion[0],Finalversion[1],0)
+    commitlist = [line.split(" ")[0] for line in s_buf]
+    chosencommitlist = []
+    for commit in commitlist:
+        index = commitlist.index(commit)
+        if index%10 == 0:
+            version = get_commitversion(repopath,commit)
+            if version < thresholdversion:
+                break
+            chosencommitlist += [(commit,get_committime(repopath,commit))]
+    return chosencommitlist
+

@@ -42,6 +42,8 @@ def Patchevolution_tracker(repo,branch,patches_info):
     cve_functioncontent = {}
     cve_commit_element_content = {}
     patchlocator_result = "output/upstreamresults/"+repo+"/"+branch
+    chosencommits = helper_zz.get_chosencommits(repo,branch)
+    print 'chosencommits for',branch,':',chosencommits
     with open(patchlocator_result,"r") as f:
         s_buf = f.readlines()
     for line in s_buf:
@@ -49,7 +51,11 @@ def Patchevolution_tracker(repo,branch,patches_info):
         if any(ignore in line for ignore in ['#','[','None','too many candidates','not exist','initcommit','fail']):
             continue
         cve,maincommit = line.split(" ")[:2]
+        patchtime = helper_zz.get_committime(repopath,maincommit)
+        chosencommits_filter = [commit[0] for commit in chosencommits if commit[1]>patchtime]
+
         print 'Patch evolution tracking for',cve
+        print 'add some commits after patch:',chosencommits_filter
         beforecommit=helper_zz.get_previouscommit(repopath,maincommit)
         (cve,original_repo,original_commit)=cve_info[cve]
         original_repopath = helper_zz.get_repopath(original_repo)
@@ -63,6 +69,7 @@ def Patchevolution_tracker(repo,branch,patches_info):
             if not aftercommits:
                 #todo file path change
                 continue
+            aftercommits += chosencommits_filter
             for afterpatchcommit in aftercommits:
                 if afterpatchcommit not in cve_commit_element_content[cve]['aftercommits']:
                     cve_commit_element_content[cve]['aftercommits'][afterpatchcommit]={}
@@ -77,11 +84,11 @@ def Patchevolution_tracker(repo,branch,patches_info):
                         #print cve,repopath,afterpatchcommit,filename,funcname,'not exist'
                         continue
                     funccontent=list(funccontent)[0]
-                    if funccontent in cve_functioncontent[cve][element]:
-                        continue
-                    else:
-                        cve_commit_element_content[cve]['aftercommits'][afterpatchcommit][element] = funccontent
-                        cve_functioncontent[cve][element].add(funccontent)
+                    if afterpatchcommit not in chosencommits:
+                        if funccontent in cve_functioncontent[cve][element]:
+                            continue
+                    cve_commit_element_content[cve]['aftercommits'][afterpatchcommit][element] = funccontent
+                    cve_functioncontent[cve][element].add(funccontent)
     
     cve_commit_element_content2 = copy.deepcopy(cve_commit_element_content)
     for cve in cve_commit_element_content:
