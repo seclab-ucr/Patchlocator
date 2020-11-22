@@ -84,7 +84,7 @@ def Patchevolution_tracker(repo,branch,patches_info):
                         #print cve,repopath,afterpatchcommit,filename,funcname,'not exist'
                         continue
                     funccontent=list(funccontent)[0]
-                    if afterpatchcommit not in chosencommits:
+                    if afterpatchcommit not in chosencommits_filter:
                         if funccontent in cve_functioncontent[cve][element]:
                             continue
                     cve_commit_element_content[cve]['aftercommits'][afterpatchcommit][element] = funccontent
