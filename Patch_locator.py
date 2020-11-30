@@ -126,7 +126,7 @@ def get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog,
         #restore the files of target branch
         updatedfiles=helper_zz.checkoutfiles_commit(targetrepopath,targetbranch,patchfiles)
         if len(inf) >0:
-            #logresult([cve,'should be patched in initial commit',initcommit])
+            logresult([cve,'should be patched in initcommit',initcommit])
             return 'initcommit '+initcommit
     return list(fuzzcommits)
 
@@ -178,6 +178,8 @@ def patchlocator(targetrepo,targetbranch,patchesinfo):
     Targetbranch = targetbranch
 
     outputdir = 'output/upstreamresults/'+targetrepo
+    #with open(outputdir+'/'+targetbranch,'r') as f:
+    #    outputbuf = f.readlines()
     if not os.path.exists(outputdir):
         os.makedirs(outputdir)
     targetrepopath=helper_zz.get_repopath(targetrepo)
@@ -195,6 +197,8 @@ def patchlocator(targetrepo,targetbranch,patchesinfo):
         if targetrepo == "android" or targetrepo == "linux":
             if "linux" not in repo and "common" not in repo:
                 continue
+        #if any(cve in line for line in outputbuf):
+        #    continue
         result =get_strict_patchcommits((cve,repo,commit),targetrepo,targetbranch,commitlog,mainlogcommits)
         if type(result)==str:
             if 'initcommit' in result:
